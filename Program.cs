@@ -51,7 +51,7 @@ namespace HelloWorldVue
             var window = new PhotinoWindow(windowTitle, windowConfiguration)
                 .Resize(50, 50, "%")
                 .Center()
-                .UserCanResize(false)
+                .UserCanResize(true)
                 // Most event handlers can be registered after the
                 // PhotinoWindow was instantiated by calling a registration 
                 // method like the following RegisterWebMessageReceivedHandler.

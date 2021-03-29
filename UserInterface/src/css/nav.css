@@ -1,0 +1,46 @@
+.navStyle {
+    height: 100%;
+    width: 0;
+    overflow-x: hidden; /* Might be worth changing this due to long */
+    overflow-y: auto;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(189, 189, 189);
+}
+
+.navTitleDiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid black;
+}
+
+.nav-button {
+    display: block;
+    width: 100%;
+    padding: .3rem;
+    padding-left: calc(2rem + 16px + .5rem);
+    line-height: 2;
+    text-align: left;
+    font: inherit;
+    font-size: 13px;
+    color: inherit;
+    border: none;
+    background-color: transparent;
+    cursor: default;
+}
+
+.nav-button:hover {
+    outline: none;
+    background-color: white;
+}
+
+.nav-button:focus {
+    outline: none;
+    background-color: rgb(133, 179, 179);
+}
+
+.button-grouping {
+    padding: 10px 10px;
+}
