@@ -1,7 +1,6 @@
 import React from 'react';
 import '../css/nav.css';
 
-
 class NavBarComponent extends React.Component {
 
     componentDidMount() {
@@ -10,10 +9,10 @@ class NavBarComponent extends React.Component {
 
     render() {
         return (
-            <nav id="nav" class="navStyle">
-                <button id="saveButton" class="nav-button">Save</button>
-                <button id="loadButton" class="nav-button">Load</button>
-                <button id="newButton" class="nav-button">New</button>
+            <nav id="nav" className="navStyle">
+                <button id="saveButton" className="nav-button">Save</button>
+                <button id="loadButton" className="nav-button">Load</button>
+                <button id="newButton" className="nav-button">New</button>
             </nav>
         );
     }

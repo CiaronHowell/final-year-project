@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="App">
       <NavBarComponent/>
-      <div id="main" class="content">
+      <div id="main" className="content">
         <button id="openCloseNavButton">OpenClose</button>
         <FlowchartControlsComponent/>
         <BpmnModelerComponent/>
