@@ -6,7 +6,6 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import '../css/diagram.css';
 
 class BpmnModelerComponent extends React.Component {
-
     constructor() {
         super();
 
@@ -46,7 +45,7 @@ class BpmnModelerComponent extends React.Component {
             event.preventDefault()
 
             console.log("created event listener for load button clicks");
-
+            this.loadDiagram();
         });
 
         const newButton = document.getElementById('newButton');
@@ -54,7 +53,7 @@ class BpmnModelerComponent extends React.Component {
             event.preventDefault()
 
             console.log("created event listener for new button clicks");
-
+            this.modeler.createDiagram();
         });
     }
 
@@ -75,13 +74,11 @@ class BpmnModelerComponent extends React.Component {
 
     }
 
-    openDiagram() {
-        // Open file picker window
-        // Load diagram
-
+    loadDiagram() {
         // Send command to backend
         window.external.sendMessage("openFunc");
 
+        let self = this;
         // Wait for reply with XML to load diagram
         window.external.receiveMessage(async function (message) {
             // Split the message into command and value
@@ -89,10 +86,10 @@ class BpmnModelerComponent extends React.Component {
 
             // If the message isn't the command that we want then we just 
             //  return nothing
-            if (command[0] !== "openFunc") return;
+            if (command[0] !== "loadDiagramFunc") return;
 
             // Display diagram
-            await this.modeler.importXML(command[1])
+            await self.modeler.importXML(command[1])
         });
     }
 
