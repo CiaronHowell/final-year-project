@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <Platforms>AnyCPU;x64</Platforms>
+	<UseWindowsForms>true</UseWindowsForms>
+	<AssemblyName>final-year-project</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
