@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using PhotinoNET;
 
 namespace HelloWorldVue
@@ -9,7 +10,7 @@ namespace HelloWorldVue
         static void Main(string[] args)
         {
             // Window title declared here for visibility
-            string windowTitle = "Photino.Vue Demo App";
+            string windowTitle = "Final Year Project";
 
             // Define the PhotinoWindow options. Some handlers 
             // can only be registered before a PhotinoWindow instance
@@ -17,20 +18,6 @@ namespace HelloWorldVue
             // that must be defined here.
             Action<PhotinoWindowOptions> windowConfiguration = options =>
             {
-                // Custom scheme handlers can only be registered during
-                // initialization of a PhotinoWindow instance.
-                // options.CustomSchemeHandlers.Add("app", (string url, out string contentType) =>
-                // {
-                //     contentType = "text/javascript";
-                //     return new MemoryStream(Encoding.UTF8.GetBytes(@"
-                //         (() =>{
-                //             window.setTimeout(() => {
-                //                 alert(`🎉 Dynamically inserted JavaScript.`);
-                //             }, 1000);
-                //         })();
-                //     "));
-                // });
-
                 // Window creating and created handlers can only be
                 // registered during initialization of a PhotinoWindow instance.
                 // These handlers are fired before and after the native constructor
@@ -59,23 +46,43 @@ namespace HelloWorldVue
                 .RegisterWebMessageReceivedHandler(MessageHandler)
                 .Load("wwwroot/index.html");
 
-            DiagramManager manager = new DiagramManager();
-            manager.SaveDiagram("test");
+            //DiagramManager.SaveDiagram("test");
+
+            //Debug.WriteLine($"DiagramManager call: {DiagramManager.GetDiagramXML()}");
 
             window.WaitForClose();
-
         }
 
-        private static void MessageHandler(object sender, string message) {
+        /// <summary>
+        /// Message Handler for messages from GUI
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="message"></param>
+        private static void MessageHandler(object sender, string message) 
+        {
             var window = (PhotinoWindow)sender;
 
-            // The message argument is coming in from sendMessage.
-            // "window.external.sendMessage(message: string)"
-            string response = $"Received message: \"{message}\"";
+            string[] command = message.Split(',');
+            switch (command[0])
+            {
+                case "openFunc":
+                    string diagram = DiagramManager.GetDiagramXML();
 
-            // Send a message back the to JavaScript event handler.
-            // "window.external.receiveMessage(callback: Function)"
-            window.SendWebMessage(response);
+                    window.SendWebMessage($"loadDiagramFunc,{diagram}");
+                    break;
+
+                case "saveFunc":
+                    DiagramManager.SaveDiagram(command[1]);
+                    break;
+
+                case "test":
+                    window.SendWebMessage(command[1]);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException("Received an unknown command");
+            }
+
         }
     }
 }
