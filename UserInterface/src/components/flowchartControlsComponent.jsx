@@ -25,7 +25,7 @@ class FlowchartControlsComponent extends React.Component {
     }
 
     callDotNet() {
-        window.external.sendMessage('blah😋');
+        window.external.sendMessage('test,blah😋');
 
         console.log('blashhhh');
 
