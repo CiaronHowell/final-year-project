@@ -34,8 +34,6 @@ class FlowchartControlsComponent extends React.Component {
         });
     }
 
-    
-
     render() {
         return (
             <div id="controls">
