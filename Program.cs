@@ -1,8 +1,9 @@
 using System;
 using System.Diagnostics;
+using FinalYearProject.Backend;
 using PhotinoNET;
 
-namespace HelloWorldVue
+namespace FinalYearProject
 {
     class Program
     {
@@ -12,43 +13,35 @@ namespace HelloWorldVue
             // Window title declared here for visibility
             string windowTitle = "Final Year Project";
 
-            // Define the PhotinoWindow options. Some handlers 
-            // can only be registered before a PhotinoWindow instance
-            // is initialized. Currently there are three handlers
-            // that must be defined here.
+            // Need to register these handlers before initialising the window
             Action<PhotinoWindowOptions> windowConfiguration = options =>
             {
-                // Window creating and created handlers can only be
-                // registered during initialization of a PhotinoWindow instance.
-                // These handlers are fired before and after the native constructor
-                // method is called.
+                // This event handler is fired before the windows constructor is called
                 options.WindowCreatingHandler += (object sender, EventArgs args) =>
                 {
                     var window = (PhotinoWindow)sender; // Instance is not initialized at this point. Class properties are not set yet.
                     Console.WriteLine($"Creating new PhotinoWindow instance.");
                 };
 
+                // This event handler is fired after the windows constructor is called
                 options.WindowCreatedHandler += (object sender, EventArgs args) =>
                 {
                     var window = (PhotinoWindow)sender; // Instance is initialized. Class properties are now set and can be used.
                     Console.WriteLine($"Created new PhotinoWindow instance with title {window.Title}.");
                 };
+
+                // This event handler will handle messages sent from the GUI.
+                // I could register this after initialising the window but seems neater here
+                options.WebMessageReceivedHandler += MessageHandler;
+
+                //options.WindowClosingHandler - If I need to 
             };
 
             var window = new PhotinoWindow(windowTitle, windowConfiguration)
                 .Resize(50, 50, "%")
                 .Center()
                 .UserCanResize(true)
-                // Most event handlers can be registered after the
-                // PhotinoWindow was instantiated by calling a registration 
-                // method like the following RegisterWebMessageReceivedHandler.
-                // This could be added in the PhotinoWindowOptions if preferred.
-                .RegisterWebMessageReceivedHandler(MessageHandler)
                 .Load("wwwroot/index.html");
-
-            //DiagramManager.SaveDiagram("test");
-
-            //Debug.WriteLine($"DiagramManager call: {DiagramManager.GetDiagramXML()}");
 
             window.WaitForClose();
         }
