@@ -59,17 +59,39 @@ namespace FinalYearProject
             switch (command[0])
             {
                 case "openFunc":
-                    string diagram = DiagramManager.GetDiagramXML();
+                    try
+                    {
+                        // Retrieve diagram
+                        string diagram = DiagramManager.GetDiagramXML();
 
-                    window.SendWebMessage($"loadDiagramFunc,{diagram}");
+                        // Send diagram XML to the GUI
+                        window.SendWebMessage($"loadDiagramFunc,{diagram}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+
+                        window.OpenAlertWindow("Loading Diagram", "Failed to load diagram.");
+                    }
                     break;
 
                 case "saveFunc":
-                    DiagramManager.SaveDiagram(command[1]);
+                    try
+                    {
+                        DiagramManager.SaveDiagram(command[1]);
+
+                        window.OpenAlertWindow("Saving Diagram", "Saved diagram successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+
+                        window.OpenAlertWindow("Saving Diagram", "Failed to save diagram.");
+                    }
                     break;
 
                 case "test":
-                    window.SendWebMessage(command[1]);
+                    window.SendWebMessage(message);
                     break;
 
                 default:
