@@ -28,7 +28,13 @@ class BpmnModelerComponent extends React.Component {
         // zoom to fit full viewport
         canvas.zoom('fit-viewport');
 
+        // Add the event handlers only once
         this.addNavButtonEventHandlers();
+        this.addWindowMessageEventHandlers();
+    }
+
+    componentWillUnmount() {
+        this.modeler.destroy();
     }
 
     addNavButtonEventHandlers() {
@@ -57,30 +63,9 @@ class BpmnModelerComponent extends React.Component {
         });
     }
 
-    componentWillUnmount() {
-        this.modeler.destroy();
-
-    }
-
-    async saveDiagram() {
-        // Get XML from the diagram
-        // Save XML into file using name parameter
-        // User will set name when using where to save
-
-        const { xml } = await this.modeler.saveXML({ format: true });
-        console.log(xml)
-
-        window.external.sendMessage("saveFunc,".concat(xml));
-
-    }
-
-    loadDiagram() {
-        // Send command to backend
-        window.external.sendMessage("openFunc");
-
-        let self = this;
+    addWindowMessageEventHandlers() {
         // Wait for reply with XML to load diagram
-        window.external.receiveMessage(async function (message) {
+        window.external.receiveMessage(async (message) => {
             // Split the message into command and value
             var command = message.split(",");
 
@@ -89,8 +74,24 @@ class BpmnModelerComponent extends React.Component {
             if (command[0] !== "loadDiagramFunc") return;
 
             // Display diagram
-            await self.modeler.importXML(command[1])
+            await this.modeler.importXML(command[1])
+
+            console.log(this.count++);
         });
+    }
+
+    async saveDiagram() {
+        // Save the current diagram
+        const { xml } = await this.modeler.saveXML({ format: true });
+        console.log(xml)
+
+        // Send the command plus the diagram in XML form
+        window.external.sendMessage("saveFunc,".concat(xml));
+    }
+
+    loadDiagram() {
+        // Send command and let the backend handle it
+        window.external.sendMessage("openFunc");
     }
 
     render() {

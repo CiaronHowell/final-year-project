@@ -19,19 +19,21 @@ class FlowchartControlsComponent extends React.Component {
             };
 
             window.external.receiveMessage((message) => console.log("Emulating receiveMessage.\nMessage received: " + message));
-        } else {
-            window.external.receiveMessage((message) => alert(message));
         }
+
+        window.external.receiveMessage((message) => {
+            var command = message.split(",");
+
+            if (command[0] !== "test") return;
+
+            alert(command[1]);
+        });
     }
 
     callDotNet() {
         window.external.sendMessage('test,blah😋');
 
         console.log('blashhhh');
-
-        window.external.receiveMessage(function (message) {
-            alert(message);
-        });
     }
 
     render() {
