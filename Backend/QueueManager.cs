@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace FinalYearProject.Backend
@@ -54,14 +55,17 @@ namespace FinalYearProject.Backend
             if (PauseToken.Pause)
             {
                 PauseToken.Pause = false;
+                Debug.WriteLine("Resume workflow");
+
                 return;
             }
 
             // TODO: Do checks to make sure queue has been sorted
 
-
             // Add/"Reset" cancel token
             CancelTokenSource = new CancellationTokenSource();
+            // Register callback method that will run post cancellation
+            CancelTokenSource.Token.Register(CleanUp);
 
             // Start thread to run tasks
             Thread thread = new(() => Run(CancelTokenSource.Token));
@@ -77,21 +81,38 @@ namespace FinalYearProject.Backend
             // Loop through each queue element
             while (CurrentTasks.Count > 0)
             {
+                if (PauseToken.Pause)
+                {
+                    Debug.WriteLine($"Paused: {PauseToken.Pause}");
+                    // Wait until unpaused or a cancellation has occurred
+                    SpinWait.SpinUntil(() => !PauseToken.Pause || cancelToken.IsCancellationRequested);
+                }
+
                 if (cancelToken.IsCancellationRequested)
                 {
-                    Console.WriteLine("Cancelled");
+                    Debug.WriteLine("Cancelled");
                     break;
                 }
 
-                if (PauseToken.Pause)
-                {
-                    Console.WriteLine($"Paused: {PauseToken.Pause}");
-                    SpinWait.SpinUntil(() => !PauseToken.Pause);
-                }
-
                 string currentTask = CurrentTasks.Dequeue();
-                Console.WriteLine($"Output from thread: {currentTask}");
+                Debug.WriteLine($"Output from thread: {currentTask}");
+
+                DateTime waitTill = DateTime.Now.AddSeconds(5);
+                SpinWait.SpinUntil(() => DateTime.Now > waitTill);
             }
+        }
+
+        /// <summary>
+        /// Performs clean up after cancellation
+        /// </summary>
+        private void CleanUp()
+        {
+            // Clear queue ready for next workflow
+            CurrentTasks.Clear();
+            Debug.WriteLine("Clearing Current Tasks");
+
+            // Make sure we're unpaused
+            PauseToken.Pause = false;
         }
 
         /// <summary>

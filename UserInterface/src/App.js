@@ -1,7 +1,7 @@
 import React from 'react';
 
 import BpmnModelerComponent from './components/bpmnModelerComponent';
-import FlowchartControlsComponent from './components/flowchartControlsComponent';
+import WorkflowControlsComponent from './components/workflowControlsComponent';
 import NavBarComponent from './components/navBarComponent';
 
 import './css/App.css';
@@ -14,7 +14,7 @@ class App extends React.Component {
         <NavBarComponent/>
         <div id="main" className="content">
           <button id="openCloseNavButton">OpenClose</button>
-          <FlowchartControlsComponent/>
+          <WorkflowControlsComponent/>
           <BpmnModelerComponent/>
         </div>
       </div>
