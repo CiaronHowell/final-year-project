@@ -7,6 +7,8 @@ namespace FinalYearProject
 {
     class Program
     {
+        private static QueueManager QueueManager { get; set; }
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -42,6 +44,9 @@ namespace FinalYearProject
                 .Center()
                 .UserCanResize(true)
                 .Load("wwwroot/index.html");
+
+            // Need to instantiate queue manager before we wait for the window to close
+            QueueManager = new();
 
             window.WaitForClose();
         }
@@ -88,6 +93,31 @@ namespace FinalYearProject
 
                         window.OpenAlertWindow("Saving Diagram", "Failed to save diagram.");
                     }
+                    break;
+
+                case "playWorkflowFunc":
+                    if (!QueueManager.HasQueue)
+                    {
+                        // TODO: Add code to load queue
+                    }
+                    
+                    QueueManager.StartQueue();
+
+
+                    break;
+
+                case "pauseWorkflowFunc":
+                    QueueManager.PauseQueue();
+
+                    //window.SendWebMessage("pauseReply,success");
+
+                    break;
+
+                case "stopWorkflowFunc":
+                    QueueManager.StopQueue();
+
+                    //window.SendWebMessage("stopReply,success");
+
                     break;
 
                 case "test":
