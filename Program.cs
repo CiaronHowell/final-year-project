@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using FinalYearProject.Backend;
 using PhotinoNET;
@@ -99,6 +100,18 @@ namespace FinalYearProject
                     if (!QueueManager.HasQueue)
                     {
                         // TODO: Add code to load queue
+                        // Temp code
+                        List<string> temp = new()
+                        {
+                            "Action 1",
+                            "Action 2",
+                            "Action 3",
+                            "Action 4",
+                            "Action 5",
+                            "Action 6",
+                            "Action 7"
+                        };
+                        QueueManager.LoadQueue(temp);
                     }
                     
                     QueueManager.StartQueue();

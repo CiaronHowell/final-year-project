@@ -1,6 +1,6 @@
 import React from 'react';
 
-class FlowchartControlsComponent extends React.Component {
+class WorkflowControlsComponent extends React.Component {
 
     constructor() {
         super();
@@ -77,12 +77,12 @@ class FlowchartControlsComponent extends React.Component {
     render() {
         return (
             <div id="controls">
-                <button id="playButton" onClick={this.playFlowchart}>Play</button>
-                <button id="pauseButton" onClick={this.pauseFlowchart}>Pause</button>
-                <button id="stopButton" onClick={this.stopFlowchart}>Stop</button>
+                <button id="playButton" onClick={this.playWorkflow}>Play</button>
+                <button id="pauseButton" onClick={this.pauseWorkflow}>Pause</button>
+                <button id="stopButton" onClick={this.stopWorkflow}>Stop</button>
             </div>
         );
     }
 }
 
-export default FlowchartControlsComponent;
+export default WorkflowControlsComponent;
