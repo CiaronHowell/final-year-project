@@ -20,28 +20,66 @@ class FlowchartControlsComponent extends React.Component {
 
             window.external.receiveMessage((message) => console.log("Emulating receiveMessage.\nMessage received: " + message));
         }
+    }
 
+    componentDidMount() {
+        this.addWindowMessageEventHandlers();
+    }
+
+    addWindowMessageEventHandlers() {
+        // Event listener for play messages
         window.external.receiveMessage((message) => {
             var command = message.split(",");
 
-            if (command[0] !== "test") return;
+            if (command[0] !== "playReply") return;
 
-            alert(command[1]);
+            // Do stuff for play
+            if (command[1] === "success") {
+
+            } else {
+                // Disable play button and enable pause button
+            }
+        });
+
+        // Event listener for pause messages
+        window.external.receiveMessage((message) => {
+            var command = message.split(",");
+
+            if (command[0] !== "pauseReply") return;
+
+            // Do stuff for play
+        });
+
+        // Event listener for stop messages
+        window.external.receiveMessage((message) => {
+            var command = message.split(",");
+
+            if (command[0] !== "stopReply") return;
+
+            // Do stuff for play if successful
+
+            // Disable editing until completion or 
         });
     }
 
-    callDotNet() {
-        window.external.sendMessage('test,blah😋');
+    playWorkflow() {
+        window.external.sendMessage('playWorkflowFunc');
+    }
 
-        console.log('blashhhh');
+    pauseWorkflow() {
+        window.external.sendMessage('pauseWorkflowFunc');
+    }
+
+    stopWorkflow() {
+        window.external.sendMessage('stopWorkflowFunc');
     }
 
     render() {
         return (
             <div id="controls">
-                <button id="playButton" onClick={this.callDotNet}>Play</button>
-                <button id="pauseButton">Pause</button>
-                <button id="stopButton">Stop</button>
+                <button id="playButton" onClick={this.playFlowchart}>Play</button>
+                <button id="pauseButton" onClick={this.pauseFlowchart}>Pause</button>
+                <button id="stopButton" onClick={this.stopFlowchart}>Stop</button>
             </div>
         );
     }
