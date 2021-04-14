@@ -20,6 +20,11 @@ namespace FinalYearProject.Backend
         private CancellationTokenSource CancelTokenSource { get; set; }
 
         /// <summary>
+        /// True if it has queue, otherwise false
+        /// </summary>
+        public bool HasQueue => CurrentTasks.Count > 0;
+
+        /// <summary>
         /// Constructor
         /// </summary>
         public QueueManager()
