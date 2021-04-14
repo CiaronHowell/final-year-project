@@ -40,6 +40,8 @@ namespace FinalYearProject.Backend
         /// <param name="tasks">The tasks of the workflow</param>
         public void LoadQueue(List<string> tasks)
         {
+            // TODO: We will load the queue with the names of the methods
+
             foreach (string task in tasks)
             {
                 CurrentTasks.Enqueue(task);
@@ -68,7 +70,7 @@ namespace FinalYearProject.Backend
             CancelTokenSource.Token.Register(CleanUp);
 
             // Start thread to run tasks
-            Thread thread = new(() => Run(CancelTokenSource.Token));
+            Thread thread = new(() => RunWorkflow(CancelTokenSource.Token));
             thread.Start();
         }
 
@@ -76,7 +78,7 @@ namespace FinalYearProject.Backend
         /// Thread that will run the tasks
         /// </summary>
         /// <param name="cancelToken">Cancel token</param>
-        private void Run(CancellationToken cancelToken)
+        private void RunWorkflow(CancellationToken cancelToken)
         {
             // Loop through each queue element
             while (CurrentTasks.Count > 0)
@@ -97,22 +99,12 @@ namespace FinalYearProject.Backend
                 string currentTask = CurrentTasks.Dequeue();
                 Debug.WriteLine($"Output from thread: {currentTask}");
 
+                // TODO: Called run method in ModuleManager with current task as the string
+                // TODO: Add try catch
+
                 DateTime waitTill = DateTime.Now.AddSeconds(5);
                 SpinWait.SpinUntil(() => DateTime.Now > waitTill);
             }
-        }
-
-        /// <summary>
-        /// Performs clean up after cancellation
-        /// </summary>
-        private void CleanUp()
-        {
-            // Clear queue ready for next workflow
-            CurrentTasks.Clear();
-            Debug.WriteLine("Clearing Current Tasks");
-
-            // Make sure we're unpaused
-            PauseToken.Pause = false;
         }
 
         /// <summary>
@@ -129,6 +121,19 @@ namespace FinalYearProject.Backend
         public void StopQueue()
         {
             CancelTokenSource.Cancel();
+        }
+
+        /// <summary>
+        /// Performs clean up after cancellation
+        /// </summary>
+        private void CleanUp()
+        {
+            // Clear queue ready for next workflow
+            CurrentTasks.Clear();
+            Debug.WriteLine("Clearing Current Tasks");
+
+            // Make sure we're unpaused
+            PauseToken.Pause = false;
         }
     }
 
