@@ -9,6 +9,7 @@ namespace FinalYearProject
     class Program
     {
         private static QueueManager QueueManager { get; set; }
+        private static ModuleManager ModuleManager { get; set; }
 
         [STAThread]
         static void Main(string[] args)
@@ -46,8 +47,13 @@ namespace FinalYearProject
                 .UserCanResize(true)
                 .Load("wwwroot/index.html");
 
-            // Need to instantiate queue manager before we wait for the window to close
+            // Need to instantiate queue manager and module manager
+            // before we wait for the window to close
             QueueManager = new();
+            ModuleManager = new();
+
+            // Load Modules
+            ModuleManager.LoadModules();
 
             window.WaitForClose();
         }

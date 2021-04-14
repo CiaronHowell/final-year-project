@@ -1,20 +1,26 @@
 ﻿using FinalYearProject.Backend.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
 namespace FinalYearProject.Backend
 {
+    /// <summary>
+    /// Module Manager
+    /// </summary>
     public class ModuleManager
     {
+        /// <summary>
+        /// App Directory
+        /// </summary>
+        private readonly string APP_DIRECTORY;
+
         /// <summary>
         /// List of created instances
         /// </summary>
         private List<object> _createdInstances;
-
-        private readonly string APP_DIRECTORY;
-
 
         /// <summary>
         /// Dictionary of loaded "Module" methods
@@ -28,8 +34,9 @@ namespace FinalYearProject.Backend
         {
             APP_DIRECTORY =
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\FinalYearProject";
-            Console.WriteLine(APP_DIRECTORY);
+            Debug.WriteLine(APP_DIRECTORY);
 
+            // We need to create the app directory for the DLL files
             if (!Directory.Exists(APP_DIRECTORY))
                 Directory.CreateDirectory(APP_DIRECTORY);
 
@@ -37,13 +44,16 @@ namespace FinalYearProject.Backend
             _createdInstances = new();
         }
 
+        /// <summary>
+        /// Load all DLL files located in app directory
+        /// </summary>
         public void LoadModules()
         {
             // Search Directory of DLLs
             string[] files = Directory.GetFiles(APP_DIRECTORY, "*.dll");
             if (files.Length == 0)
             {
-                Console.WriteLine("No files located");
+                Debug.WriteLine("No files located");
                 return;
             }
 
@@ -80,7 +90,7 @@ namespace FinalYearProject.Backend
                 foreach (MethodInfo info in infos)
                 {
                     string name = $"{type.Name}.{info.Name}";
-                    Console.WriteLine(name);
+                    Debug.WriteLine(name);
 
                     ModuleMethods.Add(
                         name,
@@ -104,7 +114,7 @@ namespace FinalYearProject.Backend
             Dictionary<string, Type> parameters = new();
             foreach (ParameterInfo parameter in method.GetParameters())
             {
-                Console.WriteLine($"     {parameter.Name} ({parameter.ParameterType})");
+                Debug.WriteLine($"     {parameter.Name} ({parameter.ParameterType})");
                 // Add parameter information to the dictionary
                 parameters.Add(parameter.Name, parameter.ParameterType);
             }
@@ -121,17 +131,17 @@ namespace FinalYearProject.Backend
             if (!ModuleMethods.ContainsKey(methodName))
             {
                 // TODO: Should I throw an error here or just log it
-                Console.WriteLine("Method not found");
+                Debug.WriteLine("Method not found");
                 return;
             }
 
-            Console.WriteLine($"Running {methodName}");
+            Debug.WriteLine($"Running {methodName}");
             Method method = ModuleMethods[methodName];
 
             // TODO: Might need to store the instance permanently
             if (!_createdInstances.Exists(x => x.GetType() == method.InstanceType))
             {
-                Console.WriteLine("Instance hit");
+                Debug.WriteLine("Instance hit");
                 _createdInstances.Add(Activator.CreateInstance(method.InstanceType));
             }
 
