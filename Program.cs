@@ -49,8 +49,8 @@ namespace FinalYearProject
 
             // Need to instantiate queue manager and module manager
             // before we wait for the window to close
-            QueueManager = new();
             ModuleManager = new();
+            QueueManager = new(ModuleManager);
 
             // Load Modules
             ModuleManager.LoadModules();
@@ -109,13 +109,8 @@ namespace FinalYearProject
                         // Temp code
                         List<string> temp = new()
                         {
-                            "Action 1",
-                            "Action 2",
-                            "Action 3",
-                            "Action 4",
-                            "Action 5",
-                            "Action 6",
-                            "Action 7"
+                            "InstanceTest.TestMethod",
+                            "InstanceTest.Start"
                         };
                         QueueManager.LoadQueue(temp);
                     }
