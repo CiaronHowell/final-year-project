@@ -56,6 +56,7 @@ namespace FinalYearProject
             // Load Modules
             ModuleManager.LoadModules();
 
+            // Allow other classes to send messages to the GUI
             Window.CurrentWindow = window;
 
             window.WaitForClose();
@@ -93,9 +94,10 @@ namespace FinalYearProject
                 case "saveFunc":
                     try
                     {
-                        DiagramManager.SaveDiagram(command[1]);
+                        DiagramManager.SaveDiagram(command[1], out bool cancelled);
 
-                        window.OpenAlertWindow("Saving Diagram", "Saved diagram successfully.");
+                        if (!cancelled)
+                            window.OpenAlertWindow("Saving Diagram", "Saved diagram successfully.");
                     }
                     catch (Exception ex)
                     {
