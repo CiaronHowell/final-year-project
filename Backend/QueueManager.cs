@@ -1,7 +1,9 @@
-﻿using System;
+﻿using FinalYearProject.Backend.Utils;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FinalYearProject.Backend
 {
@@ -11,9 +13,14 @@ namespace FinalYearProject.Backend
     public class QueueManager
     {
         /// <summary>
+        /// Stores the ModuleManager
+        /// </summary>
+        private ModuleManager ModuleManager { get; set; }
+
+        /// <summary>
         /// Stores the current tasks of the workflow
         /// </summary>
-        private Queue<string> CurrentTasks { get; set; }
+        private TaskQueue<string> CurrentTasks { get; set; }
 
         /// <summary>
         /// Stores the Cancel token for the work thread
@@ -28,10 +35,25 @@ namespace FinalYearProject.Backend
         /// <summary>
         /// Constructor
         /// </summary>
-        public QueueManager()
+        public QueueManager(ModuleManager moduleManager)
         {
             // Initialises the queue
-            CurrentTasks = new Queue<string>();
+            CurrentTasks = new TaskQueue<string>();
+            CurrentTasks.Dequeued += CurrentTasks_Dequeued;
+
+            ModuleManager = moduleManager;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender">TaskQueue</param>
+        /// <param name="e">The dequeued item</param>
+        private void CurrentTasks_Dequeued(object sender, DequeuedEventArgs<string> e)
+        {
+            Debug.WriteLine($"{e.DequeuedElement} has been dequeued");
+            
+            // TODO: Send current dequeued item back to GUI
         }
 
         /// <summary>
@@ -100,6 +122,8 @@ namespace FinalYearProject.Backend
                 Debug.WriteLine($"Output from thread: {currentTask}");
 
                 // TODO: Called run method in ModuleManager with current task as the string
+                ModuleManager.Run(currentTask);
+
                 // TODO: Add try catch
 
                 DateTime waitTill = DateTime.Now.AddSeconds(5);
