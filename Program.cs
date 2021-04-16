@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using FinalYearProject.Backend;
+using FinalYearProject.Backend.Utils;
 using PhotinoNET;
 
 namespace FinalYearProject
@@ -54,6 +55,8 @@ namespace FinalYearProject
 
             // Load Modules
             ModuleManager.LoadModules();
+
+            Window.CurrentWindow = window;
 
             window.WaitForClose();
         }

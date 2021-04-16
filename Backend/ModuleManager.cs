@@ -34,7 +34,6 @@ namespace FinalYearProject.Backend
         {
             APP_DIRECTORY =
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\FinalYearProject";
-            Debug.WriteLine(APP_DIRECTORY);
 
             // We need to create the app directory for the DLL files
             if (!Directory.Exists(APP_DIRECTORY))
@@ -62,7 +61,6 @@ namespace FinalYearProject.Backend
                 // Use LoadModule with the DLLs found
                 LoadModule(file);
             }
-
         }
 
         /// <summary>
