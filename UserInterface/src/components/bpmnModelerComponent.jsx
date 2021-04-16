@@ -75,9 +75,16 @@ class BpmnModelerComponent extends React.Component {
 
             // Display diagram
             await this.modeler.importXML(command[1])
-
-            console.log(this.count++);
         });
+
+        // Highlight the current task
+        window.external.receiveMessage((message) => {
+            var command = message.split(",");
+
+            if (command[0] !== "currentTask") return;
+
+            console.log(command[1]);
+        })
     }
 
     async saveDiagram() {

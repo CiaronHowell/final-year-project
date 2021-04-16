@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace FinalYearProject.Backend
 {
@@ -52,8 +51,9 @@ namespace FinalYearProject.Backend
         private void CurrentTasks_Dequeued(object sender, DequeuedEventArgs<string> e)
         {
             Debug.WriteLine($"{e.DequeuedElement} has been dequeued");
-            
-            // TODO: Send current dequeued item back to GUI
+
+            // Send current dequeued item back to GUI
+            Window.SendMessage("currentTask", e.DequeuedElement);
         }
 
         /// <summary>

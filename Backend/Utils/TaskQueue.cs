@@ -1,53 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FinalYearProject.Backend.Utils
 {
+    /// <summary>
+    /// Encapsulation of System.Collections.Generic.Queue
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class TaskQueue<T>
     {
+        /// <summary>
+        /// The queue
+        /// </summary>
         private Queue<T> _queue = new();
 
+        /// <summary>
+        /// Event for dequeuing
+        /// </summary>
         public event EventHandler<DequeuedEventArgs<T>> Dequeued;
 
+        /// <summary>
+        /// On dequeued
+        /// </summary>
+        /// <param name="dequeuedElement"></param>
         private void OnDequeued(T dequeuedElement)
         {
             Dequeued?.Invoke(this, new(dequeuedElement));
         }
 
+        /// <summary>
+        /// Number of elements in queue
+        /// </summary>
         public int Count => _queue.Count;
 
+        /// <summary>
+        /// Add element to queue
+        /// </summary>
+        /// <param name="element"></param>
         public void Enqueue(T element)
         {
             _queue.Enqueue(element);
         }
 
+        /// <summary>
+        /// Remove element from queue
+        /// </summary>
+        /// <returns>Element that was removed from queue</returns>
         public T Dequeue()
         {
             T element = _queue.Dequeue();
             OnDequeued(element);
+
             return element;
         }
 
+        /// <summary>
+        /// Clear the queue
+        /// </summary>
         public void Clear()
         {
             _queue.Clear();
         }
     }
 
-    //public delegate void DequeuedEventHandler(object sender, DequeuedEventArgs e);
-
+    /// <summary>
+    /// Dequeued event args
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class DequeuedEventArgs<T> : EventArgs
     {
+        /// <summary>
+        /// Dequeued element
+        /// </summary>
         public T DequeuedElement { get; private set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dequeuedElement">The dequeued element</param>
         public DequeuedEventArgs (T dequeuedElement)
         {
             DequeuedElement = dequeuedElement;
         }
-
-
     }
 }
