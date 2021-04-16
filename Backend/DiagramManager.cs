@@ -12,7 +12,7 @@ namespace FinalYearProject.Backend
         /// Save diagram in directory selected in File Dialog
         /// </summary>
         /// <param name="xml"></param>
-        public static void SaveDiagram(string xml)
+        public static void SaveDiagram(string xml, out bool cancelled)
         {
             // Configure dialog
             SaveFileDialog saveFileDialog = new()
@@ -23,8 +23,9 @@ namespace FinalYearProject.Backend
                 RestoreDirectory = true
             };
 
+            DialogResult result = saveFileDialog.ShowDialog();
             // Open the file dialog to let user select where they want to save diagram
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            if (result == DialogResult.OK)
             {
                 Debug.WriteLine($"SaveDiagramTest: {saveFileDialog.FileName}");
 
@@ -40,6 +41,8 @@ namespace FinalYearProject.Backend
                     stream.Close();
                 }
             }
+
+            cancelled = result == DialogResult.Cancel;
         }
 
         /// <summary>
@@ -49,7 +52,7 @@ namespace FinalYearProject.Backend
         public static string GetDiagramXML()
         {
             // Configure dialog
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            OpenFileDialog openFileDialog = new()
             {
                 //InitialDirectory = "" // TODO: Add home directory
                 Filter = "Diagram|*.bpmn",
@@ -75,6 +78,9 @@ namespace FinalYearProject.Backend
 
                 Debug.WriteLine($"GetDiagramTest: Diagram - {diagram}");
             }
+
+            if (string.IsNullOrWhiteSpace(diagram))
+                throw new Exception("Diagram is blank");
 
             return diagram;
         }
