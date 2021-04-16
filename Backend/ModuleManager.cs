@@ -136,15 +136,15 @@ namespace FinalYearProject.Backend
             Debug.WriteLine($"Running {methodName}");
             Method method = ModuleMethods[methodName];
 
-            // TODO: Might need to store the instance permanently
-            if (!_createdInstances.Exists(x => x.GetType() == method.InstanceType))
+            // We need to make sure that only one instance of the class is created for all methods
+            if (!_createdInstances.Exists(activatedInstance => activatedInstance.GetType() == method.InstanceType))
             {
                 Debug.WriteLine("Instance hit");
                 _createdInstances.Add(Activator.CreateInstance(method.InstanceType));
             }
 
-            // The constructor is hit when we create the instance
-            method.MethodInfo.Invoke(_createdInstances.Find(instance => instance.GetType() == method.InstanceType), null);
+            // We use the activated instance to run the method 
+            method.MethodInfo.Invoke(_createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType), null);
         }
 
     }
