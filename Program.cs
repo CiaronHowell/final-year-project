@@ -143,6 +143,14 @@ namespace FinalYearProject
                     window.SendWebMessage(message);
                     break;
 
+                case "loadModuleInfoFunc":
+                    string moduleInfo = ModuleManager.ModuleInfoAsJSONString();
+                    
+                    Debug.WriteLine(moduleInfo);
+
+                    window.SendWebMessage($"loadModuleInfoReply,{moduleInfo}");
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException("Received an unknown command");
             }

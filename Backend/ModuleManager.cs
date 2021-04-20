@@ -1,9 +1,11 @@
 ﻿using FinalYearProject.Backend.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 
 namespace FinalYearProject.Backend
 {
@@ -16,6 +18,11 @@ namespace FinalYearProject.Backend
         /// App Directory
         /// </summary>
         private readonly string APP_DIRECTORY;
+
+        /// <summary>
+        /// Dirty flag for loading modules
+        /// </summary>
+        private bool _loadingModules;
 
         /// <summary>
         /// List of created instances
@@ -48,6 +55,8 @@ namespace FinalYearProject.Backend
         /// </summary>
         public void LoadModules()
         {
+            _loadingModules = true;
+
             // Search Directory of DLLs
             string[] files = Directory.GetFiles(APP_DIRECTORY, "*.dll");
             if (files.Length == 0)
@@ -61,6 +70,8 @@ namespace FinalYearProject.Backend
                 // Use LoadModule with the DLLs found
                 LoadModule(file);
             }
+
+            _loadingModules = false;
         }
 
         /// <summary>
@@ -106,15 +117,15 @@ namespace FinalYearProject.Backend
         /// </summary>
         /// <param name="method">Method info</param>
         /// <returns>Dictionary of the parameter name and parameter type</returns>
-        private static Dictionary<string, Type> GetParameterInfo(MethodInfo method)
+        private static Dictionary<string, string> GetParameterInfo(MethodInfo method)
         {
             // Create variable to return
-            Dictionary<string, Type> parameters = new();
+            Dictionary<string, string> parameters = new();
             foreach (ParameterInfo parameter in method.GetParameters())
             {
                 Debug.WriteLine($"     {parameter.Name} ({parameter.ParameterType})");
                 // Add parameter information to the dictionary
-                parameters.Add(parameter.Name, parameter.ParameterType);
+                parameters.Add(parameter.Name, parameter.ParameterType.ToString());
             }
 
             return parameters;
@@ -145,6 +156,20 @@ namespace FinalYearProject.Backend
 
             // We use the activated instance to run the method 
             method.MethodInfo.Invoke(_createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType), null);
+        }
+
+        /// <summary>
+        /// Gets the module info as a json string 
+        /// to make it easier to send to GUI
+        /// </summary>
+        /// <returns>ModuleInfo JSON as string</returns>
+        public string ModuleInfoAsJSONString()
+        {
+            // Wait for the modules to load first 
+            if (_loadingModules)
+                SpinWait.SpinUntil(() => !_loadingModules);
+
+            return JsonConvert.SerializeObject(ModuleMethods);
         }
 
     }

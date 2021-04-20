@@ -5,12 +5,13 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { is, getBusinessObject } from 'bpmn-js/lib/util/ModelUtil'
 
 export default function ElementPropertiesComponent(props) {
-    let option = ["test", "test1", "test2", "test3" ];
-
     let {
-      element,
-      modeler
+        element,
+        modeler,
+        moduleInfo
     } = props;
+
+    const moduleNames = Object.keys(moduleInfo);
 
     if (element.labelTarget) {
         element = element.labelTarget;
@@ -20,6 +21,10 @@ export default function ElementPropertiesComponent(props) {
         const modeling = modeler.get('modeling');
   
         modeling.updateLabel(element, name);
+    }
+
+    function updateParameters() {
+        
     }
   
     async function updateParameter(parameterName, value, type) {
@@ -33,12 +38,11 @@ export default function ElementPropertiesComponent(props) {
         // to append to the element
         const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
 
-
-        const test = moddle.create('method:parameter');
-        test.name = parameterName;
-        test.value = value
-        test.type = type;
-        extensionElements.get('values').push(test);
+        const method = moddle.create('method:parameter');
+        method.name = parameterName;
+        method.value = value
+        method.type = type;
+        extensionElements.get('values').push(method);
 
         const modeling = modeler.get('modeling');
         modeling.updateProperties(element, {
@@ -53,53 +57,84 @@ export default function ElementPropertiesComponent(props) {
     }
   
     async function makeServiceTask() {
-      const bpmnReplace = modeler.get('bpmnReplace');
+        const bpmnReplace = modeler.get('bpmnReplace');
   
-      bpmnReplace.replaceElement(element, {
-        type: 'bpmn:ServiceTask'
-      });
-
-      option = [ "yeetus", "mcbeetus"];
+        bpmnReplace.replaceElement(element, {
+            type: 'bpmn:ServiceTask'
+        });
     }
-  
+
+    function methodSelected(moduleName) {
+        const info = moduleInfo[moduleName];
+        console.log(info);
+    }
+
+    // If it's a task element then give the option of selecting a method
+    if (is(element, 'bpmn:Task') && !is(element, 'bpmn:ServiceTask')) {
+        console.log('is a task still');
+        return (
+            <div className="element-properties" key={ element.id }>
+                <fieldset>
+                    <label>id</label>
+                    <span>{ element.id }</span>
+                </fieldset>
+
+                <fieldset>
+                    <Autocomplete 
+                        options={moduleNames}
+                        onChange={(event, methodName) => {
+                            updateName(methodName);
+                            if (!is(element, 'bpmn:ServiceTask')) makeServiceTask();
+                            methodSelected(methodName);
+                        }}
+                        renderInput={(params) => <TextField {...params} label="Task"/>}
+                    />
+                </fieldset>
+            </div>
+        );
+    }
+    // If it's not a service task then just display the ID
+    else if (!is(element, 'bpmn:ServiceTask')) {
+        return (
+            <div className="element-properties" key={ element.id }>
+                <fieldset>
+                    <label>id</label>
+                    <span>{ element.id }</span>
+                </fieldset>
+            </div>
+        );
+    }
+
     return (
-      <div className="element-properties" key={ element.id }>
-        <fieldset>
-          <label>id</label>
-          <span>{ element.id }</span>
-        </fieldset>
-
-        <fieldset>
-            <Autocomplete 
-                options={option}
-                // onChange
-                renderInput={(params) => <TextField {...params} label="Class"/>}
-            />
-            <Autocomplete 
-                options={option}
-                // hidden={}
-                renderInput={(params) => <TextField {...params} label="Method"/>}
-            />
-        </fieldset>
-
-        {
-          is(element, 'bpmn:ServiceTask') &&
+        <div className="element-properties" key={ element.id }>
             <fieldset>
-              <label>topic (custom)</label>
-              <input value={ element.businessObject.get('method:parameter') } onChange={ (event) => {
-                updateParameter(event.target.value, "test", "String")
-              } } />
+                <label>id</label>
+                <span>{ element.id }</span>
             </fieldset>
-        }
 
-        <fieldset>
-          <label>actions</label>
-  
-          {
-            is(element, 'bpmn:Task') && !is(element, 'bpmn:ServiceTask') &&
-              <button onClick={ makeServiceTask }>Make Service Task</button>
-          }
-        </fieldset>
-      </div>
+            <fieldset>
+                <Autocomplete 
+                    options={moduleNames}
+                    onChange={(event, methodName) => {
+                        updateName(methodName);
+                        methodSelected(methodName);
+                    }}
+                    value={element.businessObject.name}
+                    renderInput={(params) => <TextField {...params} label="Method"/>}
+                />
+            </fieldset>
+
+            <fieldset id="parameters">
+
+            </fieldset>
+
+            <fieldset>
+                <button onClick={() => {
+                    updateParameters()
+                }}>
+                    Save Parameters
+                </button>
+            </fieldset>
+        </div>
     );
-  }
+}

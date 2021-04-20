@@ -33,17 +33,23 @@ class PropertiesViewComponent extends React.Component {
 
             if (!currentElement) return;
 
-            if (e.element.id === currentElement.id) {
-                this.setState({
-                    element: e.element
-                });
-            }
+            // if (e.element.id === currentElement.id &&
+            //     currentElement.name !== e.element.name) {
+            //     console.log('This current selected element has changed')
+
+            //     currentElement.name = e.element.name;
+                
+            //     // this.setState({
+            //     //     element: e.element
+            //     // });
+            // }
         });
     }
 
     render() {
         const {
-            modeler
+            modeler,
+            moduleInfo
         } = this.props;
     
         const {
@@ -54,7 +60,7 @@ class PropertiesViewComponent extends React.Component {
         if (selectedElements.length === 1) {
             this.props.container.style.visibility = "visible";
 
-            return <ElementPropertiesComponent modeler={ modeler } element={ element } />;
+            return <ElementPropertiesComponent modeler={ modeler } element={ element } moduleInfo={ moduleInfo } />;
         }
 
         this.props.container.style.visibility = "hidden";

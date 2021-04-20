@@ -76,11 +76,11 @@ namespace FinalYearProject.Backend
                     stream.Close();
                 }
 
+                if (string.IsNullOrWhiteSpace(diagram))
+                    throw new Exception("Diagram is blank");
+
                 Debug.WriteLine($"GetDiagramTest: Diagram - {diagram}");
             }
-
-            if (string.IsNullOrWhiteSpace(diagram))
-                throw new Exception("Diagram is blank");
 
             return diagram;
         }
