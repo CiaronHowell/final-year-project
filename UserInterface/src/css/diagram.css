@@ -1,4 +1,16 @@
 #canvas {
+    display: flex;
+    justify-content: space-around;
     flex-grow: 1;
     height: 100%;
+}
+
+#properties-panel {
+    /* visibility: hidden;
+    position: absolute;
+    float: right; */
+    z-index: 10;
+    position: fixed;
+    right: 10px;
+    /* flex */
 }
