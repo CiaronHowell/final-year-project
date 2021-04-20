@@ -1,0 +1,33 @@
+{
+    "name": "Method",
+    "uri": "http://Method",
+    "prefix": "method",
+    "xml": {
+        "tagAlias": "lowerCase"
+    },
+    "types": [
+        {
+            "name": "parameter",
+            "superClass": [ "Element" ],
+            "properties": [
+                {
+                    "name": "name",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "value",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "type",
+                    "isAttr": true,
+                    "type": "String"
+                }
+            ]
+        }
+    ],
+    "emumerations": [],
+    "associations": []
+}

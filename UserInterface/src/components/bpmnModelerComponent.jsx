@@ -1,23 +1,52 @@
 import React from 'react';
 import BpmnModeler from 'bpmn-js/lib/Modeler';
 
+// Imports the moddle json file 
+import parameterModdleExtension from '../moddle/parameters';
+
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import '../css/diagram.css';
+
+import PropertiesPanel from '../scripts/propertiesPanel';
 
 class BpmnModelerComponent extends React.Component {
     constructor() {
         super();
 
         this.containerRef = React.createRef();
+
+        // // Create class variable
+        // this.modeler = null;
+
+        // // 
+        // window.external.receiveMessage((message) => {
+        //     // Split the message into command and value
+        //     var command = message.split(",");
+
+        //     // If the message isn't the command that we want then we just 
+        //     //  return nothing
+        //     if (command[0] !== "loadModdlesReply") return;
+
+        //     // Dynamically add the moddles per class
+        //     // TODO: Use command[1] to get the moddles
+        //     // TODO: Append to the object below
+        //     const moddles = { test: 'test'};
+
+        //     // Display diagram
+        //     this.initialiseBPMN(moddles);
+        // });
     }
-    
-    async componentDidMount() {
+
+    async initialiseBPMN(moddles) {
         // Gets current container
         const container = this.containerRef.current;
-
         this.modeler = new BpmnModeler({
-            container: container
+            container: container,
+            moddleExtensions: moddles,
+            keyboard: {
+                bindTo: document.body
+            }
         });
 
         await this.modeler.createDiagram();
@@ -27,6 +56,21 @@ class BpmnModelerComponent extends React.Component {
 
         // zoom to fit full viewport
         canvas.zoom('fit-viewport');
+
+        // Never used as it's just to create properties panel
+        const panel = new PropertiesPanel({
+            container: document.querySelector('#properties-panel'),
+            modeler: this.modeler
+        })
+    }
+    
+    componentDidMount() {
+        // // Send initialise flag to backend to get classes and methods
+        // window.external.sendMessage("loadModdlesFunc");
+        const moddle = {
+            method: parameterModdleExtension
+        }
+        this.initialiseBPMN(moddle)
 
         // Add the event handlers only once
         this.addNavButtonEventHandlers();
@@ -69,6 +113,8 @@ class BpmnModelerComponent extends React.Component {
             // Split the message into command and value
             var command = message.split(",");
 
+            console.log('hit')
+
             // If the message isn't the command that we want then we just 
             //  return nothing
             if (command[0] !== "loadDiagramFunc") return;
@@ -76,6 +122,8 @@ class BpmnModelerComponent extends React.Component {
             // Display diagram
             await this.modeler.importXML(command[1])
         });
+
+        console.log('test');
 
         // Highlight the current task
         window.external.receiveMessage((message) => {
@@ -103,7 +151,9 @@ class BpmnModelerComponent extends React.Component {
 
     render() {
         return (
-          <div id="canvas" className="react-bpmn-diagram-container" ref={ this.containerRef }></div>
+          <div id="canvas" className="react-bpmn-diagram-container" ref={ this.containerRef }>
+              <div id="properties-panel"/>
+          </div>
         );
     }
 }
