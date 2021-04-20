@@ -15,27 +15,19 @@ class BpmnModelerComponent extends React.Component {
         super();
 
         this.containerRef = React.createRef();
+    }
 
-        // // Create class variable
-        // this.modeler = null;
+    componentDidMount() {
+        // // Send initialise flag to backend to get classes and methods
+        // window.external.sendMessage("loadModdlesFunc");
+        const moddle = {
+            method: parameterModdleExtension
+        }
+        this.initialiseBPMN(moddle)
 
-        // // 
-        // window.external.receiveMessage((message) => {
-        //     // Split the message into command and value
-        //     var command = message.split(",");
-
-        //     // If the message isn't the command that we want then we just 
-        //     //  return nothing
-        //     if (command[0] !== "loadModdlesReply") return;
-
-        //     // Dynamically add the moddles per class
-        //     // TODO: Use command[1] to get the moddles
-        //     // TODO: Append to the object below
-        //     const moddles = { test: 'test'};
-
-        //     // Display diagram
-        //     this.initialiseBPMN(moddles);
-        // });
+        // Add the event handlers only once
+        this.addNavButtonEventHandlers();
+        this.addWindowMessageEventHandlers();
     }
 
     async initialiseBPMN(moddles) {
@@ -57,24 +49,8 @@ class BpmnModelerComponent extends React.Component {
         // zoom to fit full viewport
         canvas.zoom('fit-viewport');
 
-        // Never used as it's just to create properties panel
-        const panel = new PropertiesPanel({
-            container: document.querySelector('#properties-panel'),
-            modeler: this.modeler
-        })
-    }
-    
-    componentDidMount() {
-        // // Send initialise flag to backend to get classes and methods
-        // window.external.sendMessage("loadModdlesFunc");
-        const moddle = {
-            method: parameterModdleExtension
-        }
-        this.initialiseBPMN(moddle)
-
-        // Add the event handlers only once
-        this.addNavButtonEventHandlers();
-        this.addWindowMessageEventHandlers();
+        // Tell backend to send us the moduleInfo
+        window.external.sendMessage('loadModuleInfoFunc');
     }
 
     componentWillUnmount() {
@@ -108,6 +84,22 @@ class BpmnModelerComponent extends React.Component {
     }
 
     addWindowMessageEventHandlers() {
+        // Wait for module info
+        window.external.receiveMessage((message) => {
+            var command = message.split(/,(.+)/);
+
+            if (command[0] !== "loadModuleInfoReply") return;
+
+            console.log(command[1]);
+            const moduleInfo = JSON.parse(command[1]);
+            // Never used as it's just to create properties panel
+            const panel = new PropertiesPanel({
+                container: document.querySelector('#properties-panel'),
+                modeler: this.modeler,
+                moduleInfo
+            });
+        });
+
         // Wait for reply with XML to load diagram
         window.external.receiveMessage(async (message) => {
             // Split the message into command and value
@@ -122,8 +114,6 @@ class BpmnModelerComponent extends React.Component {
             // Display diagram
             await this.modeler.importXML(command[1])
         });
-
-        console.log('test');
 
         // Highlight the current task
         window.external.receiveMessage((message) => {

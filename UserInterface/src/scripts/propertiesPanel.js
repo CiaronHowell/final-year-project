@@ -10,11 +10,12 @@ export default class PropertiesPanel {
 
     const {
       modeler,
-      container
+      container,
+      moduleInfo
     } = options;
 
     ReactDOM.render(
-      <PropertiesViewComponent modeler={ modeler } container={ container } />,
+      <PropertiesViewComponent modeler={ modeler } container={ container } moduleInfo={ moduleInfo } />,
       container
     );
   }
