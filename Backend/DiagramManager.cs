@@ -7,6 +7,7 @@ namespace FinalYearProject.Backend
 {
     public class DiagramManager
     {
+        public string _currentDiagram;
 
         /// <summary>
         /// Save diagram in directory selected in File Dialog
@@ -86,5 +87,6 @@ namespace FinalYearProject.Backend
         }
 
         //TODO: Might need to add a newDiagram method to keep everything in check
+        //public void ClearDiagram
     }
 }

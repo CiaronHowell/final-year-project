@@ -61,7 +61,7 @@ class BpmnModelerComponent extends React.Component {
         saveButton.addEventListener('click', async (event) => {
             event.preventDefault()
 
-            console.log("created event listener for save button clicks");
+            console.log("Attempting to save");
             this.saveDiagram();
         });
 
@@ -69,7 +69,7 @@ class BpmnModelerComponent extends React.Component {
         loadButton.addEventListener('click', async (event) => {
             event.preventDefault()
 
-            console.log("created event listener for load button clicks");
+            console.log("Attempting to load");
             this.loadDiagram();
         });
 
@@ -77,7 +77,7 @@ class BpmnModelerComponent extends React.Component {
         newButton.addEventListener('click', async (event) => {
             event.preventDefault()
 
-            console.log("created event listener for new button clicks");
+            console.log("Attempting to create new diagram");
             this.modeler.createDiagram();
         });
     }
