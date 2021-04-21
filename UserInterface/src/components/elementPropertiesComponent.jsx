@@ -23,12 +23,10 @@ export default function ElementPropertiesComponent(props) {
         modeling.updateLabel(element, name);
     }
 
-    function updateParameters() {
-        
-    }
-  
-    async function updateParameter(parameterName, value, type) {
-
+    // Update parameters button will only be available if the 
+    // method requires parameters so we don't need to handle not having 
+    // any parameters
+    async function updateParameters() {
         const moddle = modeler.get('moddle');
 
         // Gets the business object so we can access the 
@@ -38,19 +36,24 @@ export default function ElementPropertiesComponent(props) {
         // to append to the element
         const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
 
-        const method = moddle.create('method:parameter');
-        method.name = parameterName;
-        method.value = value
-        method.type = type;
-        extensionElements.get('values').push(method);
+        const { Parameters } = moduleInfo[businessObject.name];
+
+        const parentElement = document.getElementById('parameters');
+        const inputElements = parentElement.getElementsByTagName('input');
+        for (const inputElement of inputElements) {
+            const parameterName = inputElement.name;
+
+            const method = moddle.create('method:parameter');
+            method.name = parameterName;
+            method.value = inputElement.value;
+            method.type = Parameters[parameterName];
+            extensionElements.get('values').push(method);
+        }
 
         const modeling = modeler.get('modeling');
         modeling.updateProperties(element, {
             extensionElements
         });
-
-        console.log(extensionElements);
-        console.log(test);
 
         const { xml } = await modeler.saveXML({ format: true });
         console.log(xml)
@@ -65,8 +68,49 @@ export default function ElementPropertiesComponent(props) {
     }
 
     function methodSelected(moduleName) {
-        const info = moduleInfo[moduleName];
-        console.log(info);
+        // TODO: Remove all kids from element 
+        removeExistingParameterElements();
+
+        // {"Parameters":{"enterTheNumber":"System.Int32","enterName":"System.String"}
+        // TODO: Append an input for each parameter to the fieldset, display label name and label type left and right
+
+        const { Parameters } = moduleInfo[moduleName];
+        console.log(Parameters);
+        const parameterKeys = Object.keys(Parameters);
+
+        if (parameterKeys === null) return;
+
+        for (const parameterName of parameterKeys) {
+            addParameterElement(parameterName, Parameters[parameterName])
+        }
+    }
+
+    function removeExistingParameterElements() {
+        const parentElement = document.getElementById('parameters');
+        console.log(parentElement);
+
+        while (parentElement.lastChild) {
+            parentElement.removeChild(parentElement.lastChild);
+        }
+    }
+
+    function addParameterElement(parameterName, parameterType) {
+        const parentElement = document.getElementById('parameters');
+
+        const nameLabel = document.createElement('label');
+        nameLabel.innerText = parameterName;
+        parentElement.appendChild(nameLabel);
+
+        const parameterInput = document.createElement('input');
+        parameterInput.name = parameterName;
+        // valueInput.value = //TODO: Get prexisting value from element
+        parentElement.appendChild(parameterInput);
+
+        const typeLabel = document.createElement('label');
+        typeLabel.innerText = parameterType;
+        parentElement.appendChild(typeLabel);
+
+        parentElement.appendChild(document.createElement('br'));
     }
 
     // If it's a task element then give the option of selecting a method
@@ -85,7 +129,7 @@ export default function ElementPropertiesComponent(props) {
                         onChange={(event, methodName) => {
                             updateName(methodName);
                             if (!is(element, 'bpmn:ServiceTask')) makeServiceTask();
-                            methodSelected(methodName);
+                            // methodSelected(methodName);
                         }}
                         renderInput={(params) => <TextField {...params} label="Task"/>}
                     />
@@ -104,6 +148,8 @@ export default function ElementPropertiesComponent(props) {
             </div>
         );
     }
+
+    // methodSelected(element.businessObject.name);
 
     return (
         <div className="element-properties" key={ element.id }>

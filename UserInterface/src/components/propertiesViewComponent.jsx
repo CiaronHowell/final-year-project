@@ -20,6 +20,19 @@ class PropertiesViewComponent extends React.Component {
         } = this.props;
 
         modeler.on('selection.changed', (e) => {
+            // Get the current element from the state
+            const {
+                element: currentElement
+            } = this.state;
+
+            // Return if there is no new selection
+            if (e.newSelection.length === 0) return;
+
+            // Return if the current element isn't null and 
+            //the current element is the same as the new selection
+            // if (currentElement 
+            //     && currentElement.id === e.newSelection[0].id) return;
+
             this.setState({
                 selectedElements: e.newSelection,
                 element: e.newSelection[0]
