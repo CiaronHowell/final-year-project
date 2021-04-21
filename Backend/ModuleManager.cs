@@ -58,10 +58,15 @@ namespace FinalYearProject.Backend
             _loadingModules = true;
 
             // Search Directory of DLLs
-            string[] files = Directory.GetFiles(APP_DIRECTORY, "*.dll");
+            string[] files = Directory.GetFiles(APP_DIRECTORY, "*.dll", 
+                new EnumerationOptions 
+                { 
+                    RecurseSubdirectories = true
+                });
             if (files.Length == 0)
             {
                 Debug.WriteLine("No files located");
+                _loadingModules = false;
                 return;
             }
 
