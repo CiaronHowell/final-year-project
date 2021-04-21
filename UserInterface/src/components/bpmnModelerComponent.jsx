@@ -23,7 +23,7 @@ class BpmnModelerComponent extends React.Component {
         this.initialiseBPMN()
 
         // Add the event handlers only once
-        this.addNavButtonEventHandlers();
+        // this.addNavButtonEventHandlers();
         this.addWindowMessageEventHandlers();
     }
 
@@ -54,32 +54,6 @@ class BpmnModelerComponent extends React.Component {
 
     componentWillUnmount() {
         this.modeler.destroy();
-    }
-
-    addNavButtonEventHandlers() {
-        const saveButton = document.getElementById('saveButton');
-        saveButton.addEventListener('click', async (event) => {
-            event.preventDefault()
-
-            console.log("Attempting to save");
-            this.saveDiagram();
-        });
-
-        const loadButton = document.getElementById('loadButton');
-        loadButton.addEventListener('click', async (event) => {
-            event.preventDefault()
-
-            console.log("Attempting to load");
-            this.loadDiagram();
-        });
-
-        const newButton = document.getElementById('newButton');
-        newButton.addEventListener('click', async (event) => {
-            event.preventDefault()
-
-            console.log("Attempting to create new diagram");
-            this.modeler.createDiagram();
-        });
     }
 
     addWindowMessageEventHandlers() {
@@ -129,6 +103,8 @@ class BpmnModelerComponent extends React.Component {
     }
 
     async saveDiagram() {
+        console.log("Attempting to save");
+
         // Save the current diagram
         const { xml } = await this.modeler.saveXML({ format: true });
         console.log(xml)
@@ -138,15 +114,35 @@ class BpmnModelerComponent extends React.Component {
     }
 
     loadDiagram() {
+        console.log("Attempting to load");
+                
         // Send command and let the backend handle it
         window.external.sendMessage("openFunc");
     }
 
+    newDiagram() {
+        console.log("Attempting to create new diagram");
+
+        // Added into it's own function for future use
+        this.modeler.createDiagram();
+    }
+
     render() {
         return (
-          <div id="canvas" className="react-bpmn-diagram-container" ref={ this.containerRef }>
-              <div id="properties-panel"/>
-          </div>
+            <div id="canvas" className="react-bpmn-diagram-container" ref={ this.containerRef }>
+                <div id="diagramControls">
+                    <button onClick={ () =>  { this.saveDiagram() } }>
+                        Save
+                    </button>
+                    <button onClick={ () =>  { this.loadDiagram() } }>
+                        Load
+                    </button>
+                    <button onClick={ () =>  { this.newDiagram() } }>
+                        New
+                    </button>
+                </div>
+                <div id="properties-panel" className="center"/>
+            </div>
         );
     }
 }

@@ -110,6 +110,9 @@ function ElementPropertiesComponent(props) {
     }
 
     function methodSelected(moduleName) {
+        // Remove all kids from fieldset element 
+        removeExistingParameterElements();
+
         // Get the parameters from the module info 
         const { Parameters } = moduleInfo[moduleName];
         const parameterKeys = Object.keys(Parameters);
@@ -122,9 +125,6 @@ function ElementPropertiesComponent(props) {
             return;
         }
 
-        // Remove all kids from fieldset element 
-        removeExistingParameterElements();
-        
         for (const parameterName of parameterKeys) {
             addParameterElement(parameterName, Parameters[parameterName]);
         }
@@ -143,30 +143,31 @@ function ElementPropertiesComponent(props) {
         const parentElement = document.getElementById('parameters');
         console.log(parentElement);
 
-        while (parentElement.lastChild) {
+        while (parentElement.lastChild && parentElement.lastChild !== parentElement.children[1]) {
             parentElement.removeChild(parentElement.lastChild);
         }
     }
 
     function addParameterElement(parameterName, parameterType) {
+        // Get the parameters fieldset
         const parentElement = document.getElementById('parameters');
 
+        // Create a label to display the parameter name
         const nameLabel = document.createElement('label');
         nameLabel.innerText = parameterName;
         parentElement.appendChild(nameLabel);
 
+        // Create an input field for the value of the parameter
         const parameterInput = document.createElement('input');
         parameterInput.name = parameterName;
+        parameterInput.placeholder = parameterType;
         // Try to get prexisting value from element or give empty string
-        console.log(getParameterValue(parameterName));
         parameterInput.value = getParameterValue(parameterName) || "";
         parentElement.appendChild(parameterInput);
 
-        const typeLabel = document.createElement('label');
-        typeLabel.innerText = parameterType;
-        parentElement.appendChild(typeLabel);
-
+        // Make sure the parameter stays on it's own "row"
         parentElement.appendChild(document.createElement('br'));
+        parentElement.appendChild(document.createElement('hr'));
     }
 
     function getParameterValue(parameterName) {
@@ -177,7 +178,7 @@ function ElementPropertiesComponent(props) {
 
         if (!businessObject.extensionElements) return;
 
-        // TODO: Return the value of the parameter name
+        // Find the correct parameter and return the value
         const extensionElements = businessObject.extensionElements.values;
         for (const extensionElement of extensionElements) {
             if (extensionElement.name === parameterName) {
@@ -190,10 +191,10 @@ function ElementPropertiesComponent(props) {
     if (is(element, 'bpmn:Task') && !is(element, 'bpmn:ServiceTask')) {
         console.log('is a task still');
         return (
-            <div className="element-properties" key={ element.id }>
+            <div className="element-properties">
                 <fieldset>
-                    <label>id</label>
-                    <span>{ element.id }</span>
+                    <label>Id: </label>
+                    <label>{ element.id }</label>
                 </fieldset>
 
                 <fieldset>
@@ -212,20 +213,20 @@ function ElementPropertiesComponent(props) {
     // If it's not a service task then just display the ID
     else if (!is(element, 'bpmn:ServiceTask')) {
         return (
-            <div className="element-properties" key={ element.id }>
+            <div className="element-properties">
                 <fieldset>
-                    <label>id</label>
-                    <span>{ element.id }</span>
+                    <label>Id: </label>
+                    <label>{ element.id }</label>
                 </fieldset>
             </div>
         );
     }
 
     return (
-        <div className="element-properties" key={ element.id }>
-            <fieldset>
-                <label>id</label>
-                <span>{ element.id }</span>
+        <div className="element-properties">
+            <fieldset >
+                <label>Id: </label>
+                <label>{ element.id }</label>
             </fieldset>
 
             <fieldset>
@@ -240,7 +241,9 @@ function ElementPropertiesComponent(props) {
                 />
             </fieldset>
 
-            <fieldset id="parameters" className="parameterDisplay"/>
+            <fieldset id="parameters" className="parameterDisplay">
+                <label>Parameters</label><br/>
+            </fieldset>
 
             <fieldset id="parameterButtonContainer" className="parameterDisplay">
                 <button onClick={() => {
@@ -249,7 +252,6 @@ function ElementPropertiesComponent(props) {
                     Save Parameters
                 </button>
             </fieldset>
-            
         </div>
     );
 }

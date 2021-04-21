@@ -32,23 +32,6 @@ code {
   overflow: hidden;
 }
 
-/* IDs */
-#openCloseNavButton {
-  /* background-image: url(../images/menu.png);
-  background-size: 30px 30px;
-  background-color: white; */
-  height: 30px;
-  width: 30px;
-  border: none;
-  z-index: 1;
-  position: relative;
-  margin: 10px 0 0 15px;
-}
-
-#main {
-  transition: margin-left .5s;
-}
-
 #root {
   width: 100%;
 }
