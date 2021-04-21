@@ -1,3 +1,7 @@
+fieldset {
+    background-color: rgb(241, 241, 241);
+}
+
 #canvas {
     display: flex;
     justify-content: space-around;
@@ -6,11 +10,25 @@
 }
 
 #properties-panel {
-    /* visibility: hidden;
-    position: absolute;
-    float: right; */
-    z-index: 10;
+    z-index: 2;
+    right: -80px;
+    left: unset;
+    width: 200px;
+}
+
+#diagramControls {
+    z-index: 2;
     position: fixed;
-    right: 10px;
-    /* flex */
+    top: 10px;
+    left: 10px;
+}
+
+.djs-palette, .center{
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 70px;
+    width: 96px;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }

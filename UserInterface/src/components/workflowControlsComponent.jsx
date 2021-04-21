@@ -76,10 +76,16 @@ class WorkflowControlsComponent extends React.Component {
 
     render() {
         return (
-            <div id="controls">
-                <button id="playButton" onClick={this.playWorkflow}>Play</button>
-                <button id="pauseButton" onClick={this.pauseWorkflow}>Pause</button>
-                <button id="stopButton" onClick={this.stopWorkflow}>Stop</button>
+            <div id="workflowControls">
+                <button id="playButton" onClick={this.playWorkflow}>
+                    Play
+                </button>
+                <button id="pauseButton" onClick={this.pauseWorkflow}>
+                    Pause
+                </button>
+                <button id="stopButton" onClick={this.stopWorkflow}>
+                    Stop
+                </button>
             </div>
         );
     }
