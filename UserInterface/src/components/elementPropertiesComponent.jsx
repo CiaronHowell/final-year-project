@@ -43,6 +43,8 @@ function ElementPropertiesComponent(props) {
         console.log('hit in updateParameters')
         const moddle = modeler.get('moddle');
 
+        console.log(element);
+
         // Gets the business object so we can access the 
         const businessObject = getBusinessObject(element);
 
@@ -55,8 +57,9 @@ function ElementPropertiesComponent(props) {
         const inputElements = parentElement.getElementsByTagName('input');
         // Gets the parameters the task needs
         const { Parameters } = moduleInfo[businessObject.name];
+        console.log(extensionElements);
         // If the parameters have already been setup then we just needd to edit them
-        if (extensionElements.values.length > 0) {
+        if (extensionElements.values) {
             for (const inputElement of inputElements) {
                 editParameterValue(inputElement.name, inputElement.value)
             }
