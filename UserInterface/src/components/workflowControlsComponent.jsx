@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Context } from '../components/contextComponent';
+
 class WorkflowControlsComponent extends React.Component {
 
     constructor() {
@@ -63,6 +65,12 @@ class WorkflowControlsComponent extends React.Component {
     }
 
     playWorkflow() {
+        // if (dirtyFlag) {
+        //     // TODO: Save diagram
+        // }
+
+
+
         window.external.sendMessage('playWorkflowFunc');
     }
 
@@ -86,6 +94,11 @@ class WorkflowControlsComponent extends React.Component {
                 <button id="stopButton" onClick={this.stopWorkflow}>
                     Stop
                 </button>
+                <Context.Consumer>
+                    {(context) => (
+                        <button onClick={()=>{context.setMessage(!context.state.running)}}>Send</button>
+                    )}
+                </Context.Consumer>
             </div>
         );
     }
