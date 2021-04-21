@@ -10,6 +10,8 @@ import '../css/diagram.css';
 
 import PropertiesPanel from '../scripts/propertiesPanel';
 
+import {Context} from '../components/contextComponent';
+
 class BpmnModelerComponent extends React.Component {
     constructor() {
         super();
@@ -130,6 +132,10 @@ class BpmnModelerComponent extends React.Component {
     render() {
         return (
             <div id="canvas" className="react-bpmn-diagram-container" ref={ this.containerRef }>
+                <Context.Consumer>
+                    {(context) => (
+                        <p>{(context.state.running) && <p>Yeet</p> }</p>)}
+                </Context.Consumer>
                 <div id="diagramControls">
                     <button onClick={ () =>  { this.saveDiagram() } }>
                         Save
