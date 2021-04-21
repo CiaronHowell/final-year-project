@@ -20,22 +20,21 @@ class BpmnModelerComponent extends React.Component {
     componentDidMount() {
         // // Send initialise flag to backend to get classes and methods
         // window.external.sendMessage("loadModdlesFunc");
-        const moddle = {
-            method: parameterModdleExtension
-        }
-        this.initialiseBPMN(moddle)
+        this.initialiseBPMN()
 
         // Add the event handlers only once
         this.addNavButtonEventHandlers();
         this.addWindowMessageEventHandlers();
     }
 
-    async initialiseBPMN(moddles) {
+    async initialiseBPMN() {
         // Gets current container
         const container = this.containerRef.current;
         this.modeler = new BpmnModeler({
             container: container,
-            moddleExtensions: moddles,
+            moddleExtensions: {
+                method: parameterModdleExtension
+            },
             keyboard: {
                 bindTo: document.body
             }
@@ -90,7 +89,7 @@ class BpmnModelerComponent extends React.Component {
 
             if (command[0] !== "loadModuleInfoReply") return;
 
-            console.log(command[1]);
+            console.log(this.modeler);
             const moduleInfo = JSON.parse(command[1]);
             // Never used as it's just to create properties panel
             const panel = new PropertiesPanel({
@@ -111,8 +110,12 @@ class BpmnModelerComponent extends React.Component {
             //  return nothing
             if (command[0] !== "loadDiagramFunc") return;
 
+            console.log(command[1]);
+
             // Display diagram
             await this.modeler.importXML(command[1])
+
+            console.log(this.modeler);
         });
 
         // Highlight the current task
