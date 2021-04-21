@@ -73,7 +73,7 @@ class PropertiesViewComponent extends React.Component {
             element
         } = this.state;
 
-        if (selectedElements.length === 1) {
+        if (selectedElements.length >= 1) {
             this.props.container.style.visibility = "visible";
 
             return <ElementPropertiesComponent modeler={ modeler } element={ element } moduleInfo={ moduleInfo } />;
