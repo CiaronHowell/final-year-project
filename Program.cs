@@ -82,6 +82,7 @@ namespace FinalYearProject
 
                         // Send diagram XML to the GUI
                         window.SendWebMessage($"loadDiagramFunc,{diagram}");
+                        Debug.WriteLine(diagram);
                     }
                     catch (Exception ex)
                     {

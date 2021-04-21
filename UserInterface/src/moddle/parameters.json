@@ -2,9 +2,6 @@
     "name": "Method",
     "uri": "http://Method",
     "prefix": "method",
-    "xml": {
-        "tagAlias": "lowerCase"
-    },
     "types": [
         {
             "name": "parameter",

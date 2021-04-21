@@ -28,10 +28,12 @@ class PropertiesViewComponent extends React.Component {
             // Return if there is no new selection
             if (e.newSelection.length === 0) return;
 
+            console.log(currentElement);
+
             // Return if the current element isn't null and 
             //the current element is the same as the new selection
-            // if (currentElement 
-            //     && currentElement.id === e.newSelection[0].id) return;
+            if (currentElement 
+                && currentElement.id === e.newSelection[0].id) return;
 
             this.setState({
                 selectedElements: e.newSelection,
@@ -46,16 +48,17 @@ class PropertiesViewComponent extends React.Component {
 
             if (!currentElement) return;
 
-            // if (e.element.id === currentElement.id &&
-            //     currentElement.name !== e.element.name) {
-            //     console.log('This current selected element has changed')
+            console.log(e.element);
 
-            //     currentElement.name = e.element.name;
-                
-            //     // this.setState({
-            //     //     element: e.element
-            //     // });
-            // }
+            // Set the element if the element has changed type
+            if (e.element.id === currentElement.id 
+                && currentElement.type !== e.element.type) {
+                console.log('hit inside element changed if');
+
+                this.setState({
+                    element: e.element
+                });
+            }
         });
     }
 
