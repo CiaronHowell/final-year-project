@@ -3,14 +3,20 @@ import React from 'react';
 export const Context = React.createContext();
 
 export default class ContextProvider extends React.Component {
-    state = {running: false}
+    state = {
+        diagramName: "",
+        running: false
+    }
 
     render() {
         return (
             <Context.Provider value={
                 {
                     state: this.state,
-                    setMessage: (value) => this.setState({
+                    setDiagramName: (value) => this.setState({
+                        diagramName: value
+                    }),
+                    setRunning: (value) => this.setState({
                         running: value
                     })
                 }

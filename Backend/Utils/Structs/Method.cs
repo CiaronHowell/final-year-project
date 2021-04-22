@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace FinalYearProject.Backend.Utils
+namespace FinalYearProject.Backend.Utils.Structs
 {
     /// <summary>
     /// Struct to contain method info
