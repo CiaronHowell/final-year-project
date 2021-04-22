@@ -9,7 +9,19 @@ namespace FinalYearProject
 {
     class Program
     {
+        /// <summary>
+        /// Diagram Manager
+        /// </summary>
+        private static DiagramManager DiagramManager { get; set; }
+
+        /// <summary>
+        /// QueueManager
+        /// </summary>
         private static QueueManager QueueManager { get; set; }
+
+        /// <summary>
+        /// Module Manager
+        /// </summary>
         private static ModuleManager ModuleManager { get; set; }
 
         [STAThread]
@@ -52,6 +64,7 @@ namespace FinalYearProject
             // before we wait for the window to close
             ModuleManager = new();
             QueueManager = new(ModuleManager);
+            DiagramManager = new();
 
             // Load Modules
             ModuleManager.LoadModules();
@@ -78,11 +91,13 @@ namespace FinalYearProject
                     try
                     {
                         // Retrieve diagram
-                        string diagram = DiagramManager.GetDiagramXML();
+                        string diagram = DiagramManager.GetDiagramXML(out string name);
 
                         // Send diagram XML to the GUI
-                        window.SendWebMessage($"loadDiagramFunc,{diagram}");
+                        window.SendWebMessage($"loadDiagramFunc,{diagram},{name}");
                         Debug.WriteLine(diagram);
+
+                        DiagramManager.ParseCurrentDiagramXML();
                     }
                     catch (Exception ex)
                     {
@@ -95,10 +110,14 @@ namespace FinalYearProject
                 case "saveFunc":
                     try
                     {
-                        DiagramManager.SaveDiagram(command[1], out bool cancelled);
+                        DiagramManager.SaveDiagram(command[1], out string name, out bool cancelled);
 
                         if (!cancelled)
+                        {
                             window.OpenAlertWindow("Saving Diagram", "Saved diagram successfully.");
+                        }
+
+                        window.SendWebMessage($"saveDiagramReply,{(cancelled ? "cancelled" : "success")}, {name}");
                     }
                     catch (Exception ex)
                     {
@@ -108,7 +127,15 @@ namespace FinalYearProject
                     }
                     break;
 
+                case "newDiagramFunc":
+                    // Just clear the "cached" diagram
+                    DiagramManager.ClearDiagram();
+                    break;
+
                 case "playWorkflowFunc":
+                    Debug.WriteLine("Inside play function now");
+                    return;
+
                     if (!QueueManager.HasQueue)
                     {
                         // TODO: Add code to load queue
