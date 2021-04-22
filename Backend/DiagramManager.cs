@@ -115,7 +115,11 @@ namespace FinalYearProject.Backend
             CurrentDiagram = "";
         }
 
-        public Dictionary<string, Parameters> ParseCurrentDiagramXML()
+        /// <summary>
+        /// Parses the current diagram from XML to List
+        /// </summary>
+        /// <returns></returns>
+        public List<WorkflowMethod> ParseCurrentDiagramXML()
         {
             XmlDocument diagram = new();
             // Parse string to XML
@@ -129,17 +133,20 @@ namespace FinalYearProject.Backend
             int numberOfElements = diagram.DocumentElement.SelectSingleNode("//bpmn:process", nsManager).ChildNodes.Count;
             int numberOfArrowElements = diagram.DocumentElement.SelectNodes("//bpmn:sequenceFlow", nsManager).Count;
 
+            // We take away 1 due to us starting with the start event
             int feasibleElements = numberOfElements - numberOfArrowElements;
 
             // Get start event by searching through the XML document for the element.
             XmlNode startElement = diagram.DocumentElement.SelectSingleNode("//bpmn:startEvent", nsManager);
             string outgoing = startElement.SelectSingleNode("bpmn:outgoing", nsManager).InnerText;
 
-            Dictionary<string, Parameters> workflow = new();
+            List<WorkflowMethod> workflow = new();
             for (int i=0; i < feasibleElements; i++)
             {
                 XmlNode currentElement = GetNextElement(diagram, nsManager, outgoing);
-                outgoing = startElement.SelectSingleNode("bpmn:outgoing", nsManager).InnerText;
+                // If the inner text is null, assume that we are at the end of the workflow and leave it blank
+                //so it breaks at the next if statement
+                outgoing = currentElement.SelectSingleNode("bpmn:outgoing", nsManager)?.InnerText;
 
                 if (string.IsNullOrWhiteSpace(outgoing)) break;
 
@@ -165,9 +172,13 @@ namespace FinalYearProject.Backend
                 }
 
                 // store name
+                string methodId = currentElement.Attributes["id"].Value;
                 string methodName = currentElement.Attributes["name"].Value;
-                Debug.WriteLine(methodName);
-                workflow.Add(methodName, new Parameters(parameterList));
+                Debug.WriteLine($"{methodId} {methodName}");
+                workflow.Add(new WorkflowMethod(
+                    methodId, 
+                    methodName, 
+                    new Parameters(parameterList)));
             }
 
             return workflow;

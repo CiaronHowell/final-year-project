@@ -1,4 +1,5 @@
 ﻿using FinalYearProject.Backend.Utils;
+using FinalYearProject.Backend.Utils.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,6 +21,11 @@ namespace FinalYearProject.Backend
         /// Stores the current tasks of the workflow
         /// </summary>
         private TaskQueue<string> CurrentTasks { get; set; }
+
+        /// <summary>
+        /// Task info
+        /// </summary>
+        private List<WorkflowMethod> TaskInfo { get; set; }
 
         /// <summary>
         /// Stores the Cancel token for the work thread
@@ -60,14 +66,16 @@ namespace FinalYearProject.Backend
         /// Loads tasks into queue
         /// </summary>
         /// <param name="tasks">The tasks of the workflow</param>
-        public void LoadQueue(List<string> tasks)
+        public void LoadQueue(List<WorkflowMethod> tasks)
         {
-            // TODO: We will load the queue with the names of the methods
-
-            foreach (string task in tasks)
+            // Load up queue with the method names
+            foreach (WorkflowMethod task in tasks)
             {
-                CurrentTasks.Enqueue(task);
+                CurrentTasks.Enqueue(task.MethodId);
             }
+
+            // Store the actual info (such parameters)
+            TaskInfo = tasks;
         }
 
         /// <summary>
@@ -83,8 +91,6 @@ namespace FinalYearProject.Backend
 
                 return;
             }
-
-            // TODO: Do checks to make sure queue has been sorted
 
             // Add/"Reset" cancel token
             CancelTokenSource = new CancellationTokenSource();
@@ -118,11 +124,14 @@ namespace FinalYearProject.Backend
                     break;
                 }
 
-                string currentTask = CurrentTasks.Dequeue();
-                Debug.WriteLine($"Output from thread: {currentTask}");
+                // Get the current task id
+                string currentTaskId = CurrentTasks.Dequeue();
+                Debug.WriteLine($"Output from thread: {currentTaskId}");
 
-                // TODO: Called run method in ModuleManager with current task as the string
-                ModuleManager.Run(currentTask);
+                // Find the task info using the task id
+                WorkflowMethod currentTask = TaskInfo.Find(workflowMethod => workflowMethod.MethodId == currentTaskId);
+                // Give the name of the method and the parameters
+                ModuleManager.Run(currentTask.MethodName, currentTask.Parameters);
 
                 // TODO: Add try catch
 

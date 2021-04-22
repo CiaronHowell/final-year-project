@@ -6,14 +6,37 @@ using System.Threading.Tasks;
 
 namespace FinalYearProject.Backend.Utils.Structs
 {
+    /// <summary>
+    /// Struct to contain workflow method
+    /// </summary>
     public struct WorkflowMethod
     {
-        public WorkflowMethod(Dictionary<string, Parameters> methods)
+        /// <summary>
+        /// Workflow method constructor
+        /// </summary>
+        /// <param name="methodName">Method name</param>
+        /// <param name="parameters">Method parameters</param>
+        public WorkflowMethod(string methodId, string methodName, Parameters parameters)
         {
-            Methods = methods;
+            MethodId = methodId;
+            MethodName = methodName;
+            Parameters = parameters;
         }
 
-        public Dictionary<string, Parameters> Methods { get; private set; }
+        /// <summary>
+        /// Method name
+        /// </summary>
+        public string MethodId { get; private set; }
+
+        /// <summary>
+        /// Method name
+        /// </summary>
+        public string MethodName { get; private set; }
+
+        /// <summary>
+        /// Method parameters
+        /// </summary>
+        public Parameters Parameters { get; private set; }
     }
 
     /// <summary>

@@ -96,8 +96,6 @@ namespace FinalYearProject
                         // Send diagram XML to the GUI
                         window.SendWebMessage($"loadDiagramFunc,{diagram},{name}");
                         Debug.WriteLine(diagram);
-
-                        DiagramManager.ParseCurrentDiagramXML();
                     }
                     catch (Exception ex)
                     {
@@ -133,19 +131,9 @@ namespace FinalYearProject
                     break;
 
                 case "playWorkflowFunc":
-                    Debug.WriteLine("Inside play function now");
-                    return;
-
                     if (!QueueManager.HasQueue)
                     {
-                        // TODO: Add code to load queue
-                        // Temp code
-                        List<string> temp = new()
-                        {
-                            "InstanceTest.TestMethod",
-                            "InstanceTest.Start"
-                        };
-                        QueueManager.LoadQueue(temp);
+                        QueueManager.LoadQueue(DiagramManager.ParseCurrentDiagramXML());
                     }
                     
                     QueueManager.StartQueue();
