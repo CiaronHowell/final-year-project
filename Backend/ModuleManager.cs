@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -140,7 +141,7 @@ namespace FinalYearProject.Backend
         /// Runs the method
         /// </summary>
         /// <param name="methodName"></param>
-        public void Run(string methodName)
+        public void Run(string methodName, Parameters parameters)
         {
             if (!ModuleMethods.ContainsKey(methodName))
             {
@@ -159,8 +160,30 @@ namespace FinalYearProject.Backend
                 _createdInstances.Add(Activator.CreateInstance(method.InstanceType));
             }
 
+            object[] parametersArray = null;
+            if (parameters.ParameterList != null)
+            {
+                int length = parameters.ParameterList.Count;
+
+                parametersArray = new object[length];
+
+                int count = 0;
+                foreach (var element in parameters.ParameterList)
+                {
+                    // convert to their respective types 
+                    Type parameterType = Type.GetType(element.Value.Type);
+                    // Get the converter for the type
+                    TypeConverter converter = TypeDescriptor.GetConverter(parameterType);
+
+                    object parsedParameterValue = converter.ConvertFromString(element.Value.Value);
+
+                    parametersArray[count++] = parsedParameterValue;
+                    Debug.WriteLine(element.Value.Value);
+                }
+            }
+
             // We use the activated instance to run the method 
-            method.MethodInfo.Invoke(_createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType), null);
+            method.MethodInfo.Invoke(_createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType), parametersArray);
         }
 
         /// <summary>
