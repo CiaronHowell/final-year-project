@@ -7,6 +7,9 @@ namespace FinalYearProject.Backend.Utils
     /// </summary>
     public class Window
     {
+        /// <summary>
+        /// Current Window to allow access to send message in Managers
+        /// </summary>
         public static PhotinoWindow CurrentWindow { get; set; }
 
         public static void SendMessage(string command, string args = null)
@@ -16,6 +19,14 @@ namespace FinalYearProject.Backend.Utils
             CurrentWindow.SendWebMessage(command);
         }
 
-        // TODO: Add sendmessage that will use the current window
+        /// <summary>
+        /// Log message to be displayed by GUI
+        /// </summary>
+        /// <param name="message">Message to log</param>
+        public static void LogMessage(string message)
+        {
+            // Log message
+            SendMessage($"ConsoleLog,{message}");
+        }
     }
 }

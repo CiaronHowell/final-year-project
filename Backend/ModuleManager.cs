@@ -180,7 +180,7 @@ namespace FinalYearProject.Backend
                     parametersArray[count++] = parsedParameterValue;
                     Debug.WriteLine(element.Value.Value);
                 }
-            }
+             }
 
             // We use the activated instance to run the method 
             method.MethodInfo.Invoke(_createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType), parametersArray);

@@ -23,6 +23,12 @@ fieldset {
     left: 10px;
 }
 
+#diagramControls button {
+    margin-right: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
 #diagramName {
     z-index: 3;
     position: fixed;
