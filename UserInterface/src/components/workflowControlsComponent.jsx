@@ -3,6 +3,9 @@ import React from 'react';
 import { Context } from '../components/contextComponent';
 
 class WorkflowControlsComponent extends React.Component {
+    // Setting the context of the component to the shared context
+    // so we can share data with other components
+    static contextType = Context;
 
     constructor() {
         super();
@@ -37,6 +40,7 @@ class WorkflowControlsComponent extends React.Component {
 
             // Do stuff for play
             if (command[1] === "success") {
+                this.context.setRunning(false);
 
             } else {
                 // Disable play button and enable pause button
@@ -65,11 +69,7 @@ class WorkflowControlsComponent extends React.Component {
     }
 
     playWorkflow() {
-        // if (dirtyFlag) {
-        //     // TODO: Save diagram
-        // }
-
-
+        this.context.setRunning(true);
 
         window.external.sendMessage('playWorkflowFunc');
     }
@@ -83,22 +83,19 @@ class WorkflowControlsComponent extends React.Component {
     }
 
     render() {
+        console.log(this.context.state.running);
+
         return (
             <div id="workflowControls">
-                <button id="playButton" onClick={this.playWorkflow}>
+                <button id="playButton" onClick={() => { this.playWorkflow() }}>
                     Play
                 </button>
-                <button id="pauseButton" onClick={this.pauseWorkflow}>
+                <button id="pauseButton" onClick={() => { this.pauseWorkflow() }}>
                     Pause
                 </button>
-                <button id="stopButton" onClick={this.stopWorkflow}>
+                <button id="stopButton" onClick={() => { this.stopWorkflow() }}>
                     Stop
                 </button>
-                <Context.Consumer>
-                    {(context) => (
-                        <button onClick={()=>{context.setMessage(!context.state.running)}}>Send</button>
-                    )}
-                </Context.Consumer>
             </div>
         );
     }

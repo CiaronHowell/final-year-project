@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import BpmnModeler from 'bpmn-js/lib/Modeler';
 
 // Imports the moddle json file 
@@ -10,13 +10,16 @@ import '../css/diagram.css';
 
 import PropertiesPanel from '../scripts/propertiesPanel';
 
-import {Context} from '../components/contextComponent';
+import { Context } from '../components/contextComponent';
 
 class BpmnModelerComponent extends React.Component {
+    static contextType = Context;
+
     constructor() {
         super();
 
         this.containerRef = React.createRef();
+        this.dirtyFlag = false;
     }
 
     componentDidMount() {
@@ -27,6 +30,17 @@ class BpmnModelerComponent extends React.Component {
         // Add the event handlers only once
         // this.addNavButtonEventHandlers();
         this.addWindowMessageEventHandlers();
+    } 
+
+    componentDidUpdate(){
+        // If the component updated then we need to check if it was due to the context values being changed
+        console.log(this.context.state.diagramName)
+        console.log(this.context.state.running)
+        // If we are about to start a run and the user has made some edits,
+        // we want the user to make sure they've saved 
+        if (this.context.state.running && this.dirtyFlag) {
+            this.saveDiagram()
+        }
     }
 
     async initialiseBPMN() {
@@ -40,6 +54,10 @@ class BpmnModelerComponent extends React.Component {
             keyboard: {
                 bindTo: document.body
             }
+        });
+
+        this.modeler.on('element.changed', (e) => {
+            this.dirtyFlag = true;
         });
 
         await this.modeler.createDiagram();
@@ -80,8 +98,6 @@ class BpmnModelerComponent extends React.Component {
             // Split the message into command and value
             var command = message.split(",");
 
-            console.log('hit')
-
             // If the message isn't the command that we want then we just 
             //  return nothing
             if (command[0] !== "loadDiagramFunc") return;
@@ -91,7 +107,10 @@ class BpmnModelerComponent extends React.Component {
             // Display diagram
             await this.modeler.importXML(command[1])
 
-            console.log(this.modeler);
+            if (command[2] !== "") {
+                // Set the name of the diagram
+                this.context.setDiagramName(command[2]);
+            }
         });
 
         // Highlight the current task
@@ -99,6 +118,19 @@ class BpmnModelerComponent extends React.Component {
             var command = message.split(",");
 
             if (command[0] !== "currentTask") return;
+
+            console.log(command[1]);
+        })
+
+        // Highlight the current task
+        window.external.receiveMessage((message) => {
+            var command = message.split(",");
+
+            if (command[0] !== "saveDiagramReply") return;
+
+            if (command[1] === "success") {
+                this.context.setDiagramName(command[2]);
+            }
 
             console.log(command[1]);
         })
@@ -113,6 +145,8 @@ class BpmnModelerComponent extends React.Component {
 
         // Send the command plus the diagram in XML form
         window.external.sendMessage("saveFunc,".concat(xml));
+
+        this.dirtyFlag = false;
     }
 
     loadDiagram() {
@@ -127,15 +161,17 @@ class BpmnModelerComponent extends React.Component {
 
         // Added into it's own function for future use
         this.modeler.createDiagram();
+
+        window.external.sendMessage("newDiagramFunc");
+
+        // Clear the diagram name
+        this.context.setDiagramName("");
     }
 
     render() {
         return (
             <div id="canvas" className="react-bpmn-diagram-container" ref={ this.containerRef }>
-                <Context.Consumer>
-                    {(context) => (
-                        <p>{(context.state.running) && <p>Yeet</p> }</p>)}
-                </Context.Consumer>
+                <label id="diagramName">{ this.context.state.diagramName }</label>
                 <div id="diagramControls">
                     <button onClick={ () =>  { this.saveDiagram() } }>
                         Save
