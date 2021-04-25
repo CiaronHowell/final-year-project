@@ -67,7 +67,7 @@ namespace FinalYearProject
             DiagramManager = new();
 
             // Load Modules
-            ModuleManager.LoadModules();
+            //ModuleManager.LoadModules();
 
             // Allow other classes to send messages to the GUI
             Window.CurrentWindow = window;
