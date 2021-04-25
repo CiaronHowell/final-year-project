@@ -11,9 +11,9 @@ fieldset {
 
 #properties-panel {
     z-index: 2;
-    right: -80px;
+    right: -105px;
     left: unset;
-    width: 200px;
+    width: 255px;
 }
 
 #diagramControls {

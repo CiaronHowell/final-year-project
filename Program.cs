@@ -24,6 +24,11 @@ namespace FinalYearProject
         /// </summary>
         private static ModuleManager ModuleManager { get; set; }
 
+        /// <summary>
+        /// Unique string to split up parameters sent to GUI
+        /// </summary>
+        private const string UNIQUE_SPLIT_STRING = "!,!";
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -84,7 +89,7 @@ namespace FinalYearProject
         {
             var window = (PhotinoWindow)sender;
 
-            string[] command = message.Split(',');
+            string[] command = message.Split(UNIQUE_SPLIT_STRING, 2);
             switch (command[0])
             {
                 case "openFunc":
@@ -94,7 +99,7 @@ namespace FinalYearProject
                         string diagram = DiagramManager.GetDiagramXML(out string name);
 
                         // Send diagram XML to the GUI
-                        window.SendWebMessage($"loadDiagramFunc,{diagram},{name}");
+                        window.SendWebMessage($"loadDiagramFunc{UNIQUE_SPLIT_STRING}{diagram}{UNIQUE_SPLIT_STRING}{name}");
                         Debug.WriteLine(diagram);
                     }
                     catch (Exception ex)
@@ -104,7 +109,7 @@ namespace FinalYearProject
                         window.OpenAlertWindow("Loading Diagram", "Failed to load diagram.");
                     }
                     break;
-
+                    
                 case "saveFunc":
                     try
                     {
@@ -115,7 +120,7 @@ namespace FinalYearProject
                             window.OpenAlertWindow("Saving Diagram", "Saved diagram successfully.");
                         }
 
-                        window.SendWebMessage($"saveDiagramReply,{(cancelled ? "cancelled" : "success")}, {name}");
+                        window.SendWebMessage($"saveDiagramReply{UNIQUE_SPLIT_STRING}{(cancelled ? "cancelled" : "success")}, {name}");
                     }
                     catch (Exception ex)
                     {
@@ -137,26 +142,37 @@ namespace FinalYearProject
                     }
                     
                     QueueManager.StartQueue();
-
-
                     break;
 
                 case "pauseWorkflowFunc":
-                    QueueManager.PauseQueue();
+                    try
+                    {
+                        QueueManager.PauseQueue();
 
-                    //window.SendWebMessage("pauseReply,success");
+                        window.OpenAlertWindow("Pausing Workflow", "Paused workflow successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+
+                        window.OpenAlertWindow("Pausing Workflow", "Failed to pause workflow.");
+                    }
 
                     break;
 
                 case "stopWorkflowFunc":
-                    QueueManager.StopQueue();
+                    try
+                    {
+                        QueueManager.StopQueue();
 
-                    //window.SendWebMessage("stopReply,success");
+                        window.OpenAlertWindow("Stopping Workflow", "Stopped workflow successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
 
-                    break;
-
-                case "test":
-                    window.SendWebMessage(message);
+                        window.OpenAlertWindow("PauStoppingsing Workflow", "Failed to stop workflow.");
+                    }
                     break;
 
                 case "loadModuleInfoFunc":
@@ -164,7 +180,11 @@ namespace FinalYearProject
                     
                     Debug.WriteLine(moduleInfo);
 
-                    window.SendWebMessage($"loadModuleInfoReply,{moduleInfo}");
+                    window.SendWebMessage($"loadModuleInfoReply{UNIQUE_SPLIT_STRING}{moduleInfo}");
+                    break;
+
+                case "test":
+                    window.SendWebMessage(message);
                     break;
 
                 default:
