@@ -1,4 +1,5 @@
-﻿using FinalYearProject.Backend.Utils.Structs;
+﻿using FinalYearProject.Backend.Utils;
+using FinalYearProject.Backend.Utils.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,10 +26,10 @@ namespace FinalYearProject.Backend
             // Configure dialog
             SaveFileDialog saveFileDialog = new()
             {
+                InitialDirectory = AppDirectories.APP_DIRECTORY,
                 Filter = "Diagram|*.bpmn",
                 FilterIndex = 1,
-                Title = "Save a Diagram",
-                RestoreDirectory = true
+                Title = "Save a Diagram"
             };
 
             // Setting name just in case the user cancels the dialog
@@ -70,11 +71,10 @@ namespace FinalYearProject.Backend
             // Configure dialog
             OpenFileDialog openFileDialog = new()
             {
-                //InitialDirectory = "" // TODO: Add home directory
+                InitialDirectory = AppDirectories.APP_DIRECTORY,
                 Filter = "Diagram|*.bpmn",
                 FilterIndex = 1,
-                Title = "Open a Diagram",
-                RestoreDirectory = true
+                Title = "Open a Diagram"
             };
 
             name = "";
