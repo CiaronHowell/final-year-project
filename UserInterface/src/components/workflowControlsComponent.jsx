@@ -34,7 +34,7 @@ class WorkflowControlsComponent extends React.Component {
     addWindowMessageEventHandlers() {
         // Event listener for play messages
         window.external.receiveMessage((message) => {
-            var command = message.split(",");
+            var command = message.split("!,!");
 
             if (command[0] !== "playReply") return;
 
@@ -49,7 +49,7 @@ class WorkflowControlsComponent extends React.Component {
 
         // Event listener for pause messages
         window.external.receiveMessage((message) => {
-            var command = message.split(",");
+            var command = message.split("!,!");
 
             if (command[0] !== "pauseReply") return;
 
@@ -58,7 +58,7 @@ class WorkflowControlsComponent extends React.Component {
 
         // Event listener for stop messages
         window.external.receiveMessage((message) => {
-            var command = message.split(",");
+            var command = message.split("!,!");
 
             if (command[0] !== "stopReply") return;
 

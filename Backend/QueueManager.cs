@@ -138,6 +138,10 @@ namespace FinalYearProject.Backend
                 DateTime waitTill = DateTime.Now.AddSeconds(5);
                 SpinWait.SpinUntil(() => DateTime.Now > waitTill);
             }
+
+            Window.CurrentWindow.OpenAlertWindow("Executing Workflow", "Workflow has finished");
+            // Send back nothing to tell the GUI to clear the coloured element
+            Window.SendMessage("currentTask", "");
         }
 
         /// <summary>

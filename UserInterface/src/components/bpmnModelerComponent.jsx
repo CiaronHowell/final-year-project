@@ -11,6 +11,7 @@ import '../css/diagram.css';
 import PropertiesPanel from '../scripts/propertiesPanel';
 
 import { Context } from '../components/contextComponent';
+import { is } from 'bpmn-js/lib/util/ModelUtil';
 
 class BpmnModelerComponent extends React.Component {
     static contextType = Context;
@@ -23,8 +24,7 @@ class BpmnModelerComponent extends React.Component {
     }
 
     componentDidMount() {
-        // // Send initialise flag to backend to get classes and methods
-        // window.external.sendMessage("loadModdlesFunc");
+        // Send initialise flag to backend to get classes and methods
         this.initialiseBPMN()
 
         // Add the event handlers only once
@@ -63,7 +63,7 @@ class BpmnModelerComponent extends React.Component {
         await this.modeler.createDiagram();
 
         // access modeler components
-        var canvas = this.modeler.get('canvas');
+        const canvas = this.modeler.get('canvas');
 
         // zoom to fit full viewport
         canvas.zoom('fit-viewport');
@@ -79,7 +79,7 @@ class BpmnModelerComponent extends React.Component {
     addWindowMessageEventHandlers() {
         // Wait for module info
         window.external.receiveMessage((message) => {
-            var command = message.split(/,(.+)/);
+            const command = message.split(/!,!(.+)/);
 
             if (command[0] !== "loadModuleInfoReply") return;
 
@@ -96,7 +96,7 @@ class BpmnModelerComponent extends React.Component {
         // Wait for reply with XML to load diagram
         window.external.receiveMessage(async (message) => {
             // Split the message into command and value
-            var command = message.split(",");
+            const command = message.split("!,!");
 
             // If the message isn't the command that we want then we just 
             //  return nothing
@@ -115,16 +115,28 @@ class BpmnModelerComponent extends React.Component {
 
         // Highlight the current task
         window.external.receiveMessage((message) => {
-            var command = message.split(",");
+            const command = message.split("!,!");
 
             if (command[0] !== "currentTask") return;
 
-            console.log(command[1]);
+            const modeling = this.modeler.get('modeling');
+            const elementRegistry = this.modeler.get('elementRegistry');
+
+            this.revertColorForTasks(elementRegistry, modeling);
+
+            const elementId = command[1];
+
+            if (!elementId) return;
+            
+            const element = elementRegistry.get(elementId);
+            modeling.setColor(element, {
+                stroke: 'green'
+            });
         })
 
         // Highlight the current task
         window.external.receiveMessage((message) => {
-            var command = message.split(",");
+            const command = message.split("!,!");
 
             if (command[0] !== "saveDiagramReply") return;
 
@@ -136,6 +148,14 @@ class BpmnModelerComponent extends React.Component {
         })
     }
 
+    revertColorForTasks(elementRegistry, modeling) {
+        elementRegistry.forEach(element => {
+            modeling.setColor(element, {
+                stroke: 'black'
+            });
+        });
+    }
+
     async saveDiagram() {
         console.log("Attempting to save");
 
@@ -144,7 +164,7 @@ class BpmnModelerComponent extends React.Component {
         console.log(xml)
 
         // Send the command plus the diagram in XML form
-        window.external.sendMessage("saveFunc,".concat(xml));
+        window.external.sendMessage("saveFunc!,!".concat(xml));
 
         this.dirtyFlag = false;
     }
