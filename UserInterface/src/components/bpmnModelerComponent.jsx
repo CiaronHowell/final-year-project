@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import BpmnModeler from 'bpmn-js/lib/Modeler';
 
 // Imports the moddle json file 
