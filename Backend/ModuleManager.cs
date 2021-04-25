@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -19,6 +20,16 @@ namespace FinalYearProject.Backend
         /// App Directory
         /// </summary>
         private readonly string APP_DIRECTORY;
+
+        /// <summary>
+        /// DLL Directory
+        /// </summary>
+        private readonly string DLL_DIRECTORY;
+
+        /// <summary>
+        /// Supporting DLLs Directory
+        /// </summary>
+        private readonly string SUPPORTING_DLLS_DIRECTORY;
 
         /// <summary>
         /// Dirty flag for loading modules
@@ -41,14 +52,65 @@ namespace FinalYearProject.Backend
         public ModuleManager()
         {
             APP_DIRECTORY =
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\FinalYearProject";
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/FinalYearProject";
+
+            DLL_DIRECTORY = APP_DIRECTORY + "/Modules";
+
+            SUPPORTING_DLLS_DIRECTORY = DLL_DIRECTORY + "/Supporting Libraries";
 
             // We need to create the app directory for the DLL files
             if (!Directory.Exists(APP_DIRECTORY))
                 Directory.CreateDirectory(APP_DIRECTORY);
 
+            if (!Directory.Exists(DLL_DIRECTORY))
+                Directory.CreateDirectory(DLL_DIRECTORY);
+
+            if (!Directory.Exists(SUPPORTING_DLLS_DIRECTORY))
+                Directory.CreateDirectory(SUPPORTING_DLLS_DIRECTORY);
+
             ModuleMethods = new Dictionary<string, Method>();
             _createdInstances = new();
+
+            // Load libraries before Modules
+            LoadSupportingLibraries();
+
+            LoadModules();
+        }
+
+        private void LoadSupportingLibraries()
+        {
+            string[] files = Directory.GetFiles(SUPPORTING_DLLS_DIRECTORY, "*.dll");
+            if (files.Length == 0)
+            {
+                Debug.WriteLine("No files located");
+                _loadingModules = false;
+                return;
+            }
+
+            foreach (string file in files)
+            {
+                Assembly ass = Assembly.LoadFrom(file);
+                Debug.WriteLine(ass.GetName());
+                //Assembly.Load(ass.Location);
+                //Assembly.Load
+                //foreach(Type type in ass.GetTypes())
+                //{
+                //    if (type.GetConstructors().Length == 0) continue;
+                //    try
+                //    {
+                //        Activator.CreateInstance(type);
+                //    }
+                //    catch
+                //    {
+
+                //    }
+
+                //}
+
+
+                //Activator.CreateInstance()
+                //Assembly.Load(file);
+            }
         }
 
         /// <summary>
@@ -59,11 +121,7 @@ namespace FinalYearProject.Backend
             _loadingModules = true;
 
             // Search Directory of DLLs
-            string[] files = Directory.GetFiles(APP_DIRECTORY, "*.dll", 
-                new EnumerationOptions 
-                { 
-                    RecurseSubdirectories = true
-                });
+            string[] files = Directory.GetFiles(DLL_DIRECTORY, "*.dll");
             if (files.Length == 0)
             {
                 Debug.WriteLine("No files located");
@@ -115,6 +173,7 @@ namespace FinalYearProject.Backend
                             type)
                         );
                 }
+
             }
         }
 
@@ -181,6 +240,8 @@ namespace FinalYearProject.Backend
                     Debug.WriteLine(element.Value.Value);
                 }
              }
+
+            //method.MethodInfo.Attributes
 
             // We use the activated instance to run the method 
             method.MethodInfo.Invoke(_createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType), parametersArray);
