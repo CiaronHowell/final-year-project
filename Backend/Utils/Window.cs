@@ -14,19 +14,9 @@ namespace FinalYearProject.Backend.Utils
 
         public static void SendMessage(string command, string args = null)
         {
-            command += string.IsNullOrWhiteSpace(args) ? "" : $",{args}";
+            command += string.IsNullOrWhiteSpace(args) ? "" : $"!,!{args}";
 
             CurrentWindow.SendWebMessage(command);
-        }
-
-        /// <summary>
-        /// Log message to be displayed by GUI
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        public static void LogMessage(string message)
-        {
-            // Log message
-            SendMessage($"ConsoleLog,{message}");
         }
     }
 }
