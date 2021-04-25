@@ -1,4 +1,5 @@
-﻿using FinalYearProject.Backend.Utils.Structs;
+﻿using FinalYearProject.Backend.Utils;
+using FinalYearProject.Backend.Utils.Structs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,21 +17,6 @@ namespace FinalYearProject.Backend
     /// </summary>
     public class ModuleManager
     {
-        /// <summary>
-        /// App Directory
-        /// </summary>
-        private readonly string APP_DIRECTORY;
-
-        /// <summary>
-        /// DLL Directory
-        /// </summary>
-        private readonly string DLL_DIRECTORY;
-
-        /// <summary>
-        /// Supporting DLLs Directory
-        /// </summary>
-        private readonly string SUPPORTING_DLLS_DIRECTORY;
-
         /// <summary>
         /// Dirty flag for loading modules
         /// </summary>
@@ -51,22 +37,15 @@ namespace FinalYearProject.Backend
         /// </summary>
         public ModuleManager()
         {
-            APP_DIRECTORY =
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/FinalYearProject";
-
-            DLL_DIRECTORY = APP_DIRECTORY + "/Modules";
-
-            SUPPORTING_DLLS_DIRECTORY = DLL_DIRECTORY + "/Supporting Libraries";
-
             // We need to create the app directory for the DLL files
-            if (!Directory.Exists(APP_DIRECTORY))
-                Directory.CreateDirectory(APP_DIRECTORY);
+            if (!Directory.Exists(AppDirectories.APP_DIRECTORY))
+                Directory.CreateDirectory(AppDirectories.APP_DIRECTORY);
 
-            if (!Directory.Exists(DLL_DIRECTORY))
-                Directory.CreateDirectory(DLL_DIRECTORY);
+            if (!Directory.Exists(AppDirectories.DLL_DIRECTORY))
+                Directory.CreateDirectory(AppDirectories.DLL_DIRECTORY);
 
-            if (!Directory.Exists(SUPPORTING_DLLS_DIRECTORY))
-                Directory.CreateDirectory(SUPPORTING_DLLS_DIRECTORY);
+            if (!Directory.Exists(AppDirectories.SUPPORTING_DLLS_DIRECTORY))
+                Directory.CreateDirectory(AppDirectories.SUPPORTING_DLLS_DIRECTORY);
 
             ModuleMethods = new Dictionary<string, Method>();
             _createdInstances = new();
@@ -79,7 +58,7 @@ namespace FinalYearProject.Backend
 
         private void LoadSupportingLibraries()
         {
-            string[] files = Directory.GetFiles(SUPPORTING_DLLS_DIRECTORY, "*.dll");
+            string[] files = Directory.GetFiles(AppDirectories.SUPPORTING_DLLS_DIRECTORY, "*.dll");
             if (files.Length == 0)
             {
                 Debug.WriteLine("No files located");
@@ -121,7 +100,7 @@ namespace FinalYearProject.Backend
             _loadingModules = true;
 
             // Search Directory of DLLs
-            string[] files = Directory.GetFiles(DLL_DIRECTORY, "*.dll");
+            string[] files = Directory.GetFiles(AppDirectories.DLL_DIRECTORY, "*.dll");
             if (files.Length == 0)
             {
                 Debug.WriteLine("No files located");
