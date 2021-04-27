@@ -133,8 +133,6 @@ namespace FinalYearProject.Backend
                 // Give the name of the method and the parameters
                 ModuleManager.Run(currentTask.MethodName, currentTask.Parameters);
 
-                // TODO: Add try catch
-
                 DateTime waitTill = DateTime.Now.AddSeconds(5);
                 SpinWait.SpinUntil(() => DateTime.Now > waitTill);
             }
