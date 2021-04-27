@@ -113,8 +113,16 @@ function ElementPropertiesComponent(props) {
         // Remove all kids from fieldset element 
         removeExistingParameterElements();
 
+        // Check if parameters are accessible if not catch and return;
+        try {
+            var { Parameters } = moduleInfo[moduleName];    
+        }
+        catch (err) {
+            console.error(err);
+            return;
+        }
         // Get the parameters from the module info 
-        const { Parameters } = moduleInfo[moduleName];
+        
         const parameterKeys = Object.keys(Parameters);
         // If there is no parameters then we will
         if (parameterKeys.length === 0) {

@@ -57,7 +57,10 @@ class BpmnModelerComponent extends React.Component {
         });
 
         this.modeler.on('element.changed', (e) => {
-            this.dirtyFlag = true;
+            console.log("Hit in element.changed");
+            console.log(e)
+            if (!this.context.state.running)
+                this.dirtyFlag = true;
         });
 
         await this.modeler.createDiagram();
