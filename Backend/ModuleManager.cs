@@ -68,27 +68,8 @@ namespace FinalYearProject.Backend
 
             foreach (string file in files)
             {
-                Assembly ass = Assembly.LoadFrom(file);
-                Debug.WriteLine(ass.GetName());
-                //Assembly.Load(ass.Location);
-                //Assembly.Load
-                //foreach(Type type in ass.GetTypes())
-                //{
-                //    if (type.GetConstructors().Length == 0) continue;
-                //    try
-                //    {
-                //        Activator.CreateInstance(type);
-                //    }
-                //    catch
-                //    {
-
-                //    }
-
-                //}
-
-
-                //Activator.CreateInstance()
-                //Assembly.Load(file);
+                // Load supporting library to Assembly
+                Assembly.LoadFrom(file);
             }
         }
 
@@ -222,8 +203,17 @@ namespace FinalYearProject.Backend
 
             //method.MethodInfo.Attributes
 
-            // We use the activated instance to run the method 
-            method.MethodInfo.Invoke(_createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType), parametersArray);
+            try
+            {
+                // We use the activated instance to run the method 
+                method.MethodInfo.Invoke(
+                    _createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType), 
+                    parametersArray);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Exception occured from invoked method: {ex}");
+            }
         }
 
         /// <summary>
