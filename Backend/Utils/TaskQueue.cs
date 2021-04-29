@@ -25,11 +25,12 @@ namespace FinalYearProject.Backend.Utils
         /// <param name="dequeuedElement"></param>
         private void OnDequeued(T dequeuedElement)
         {
+            // Invoke the event if it isn't null
             Dequeued?.Invoke(this, new(dequeuedElement));
         }
 
         /// <summary>
-        /// Number of elements in queue
+        /// Gets the number of elements in the queue
         /// </summary>
         public int Count => _queue.Count;
 
@@ -49,6 +50,7 @@ namespace FinalYearProject.Backend.Utils
         public T Dequeue()
         {
             T element = _queue.Dequeue();
+            // Get the element that is dequeued and invoke the event 
             OnDequeued(element);
 
             return element;

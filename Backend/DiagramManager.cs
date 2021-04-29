@@ -181,7 +181,7 @@ namespace FinalYearProject.Backend
                     new WorkflowMethod(
                         methodId,
                         methodName, 
-                        new Parameters(parameterList))
+                        parameterList)
                     );
 
                 Debug.WriteLine($"{methodId} {methodName}");

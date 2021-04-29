@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace FinalYearProject.Backend.Utils.Structs
 {
@@ -14,9 +10,13 @@ namespace FinalYearProject.Backend.Utils.Structs
         /// <summary>
         /// Workflow method constructor
         /// </summary>
+        /// <param name="methodId">Method ID</param>
         /// <param name="methodName">Method name</param>
         /// <param name="parameters">Method parameters</param>
-        public WorkflowMethod(string methodId, string methodName, Parameters parameters)
+        public WorkflowMethod(
+            string methodId,
+            string methodName,
+            Dictionary<string, ParameterDetails> parameters)
         {
             MethodId = methodId;
             MethodName = methodName;
@@ -36,27 +36,7 @@ namespace FinalYearProject.Backend.Utils.Structs
         /// <summary>
         /// Method parameters
         /// </summary>
-        public Parameters Parameters { get; private set; }
-    }
-
-    /// <summary>
-    /// Struct to help manage the parameters from the workflow
-    /// </summary>
-    public struct Parameters
-    {
-        /// <summary>
-        /// Parameters Constructor
-        /// </summary>
-        /// <param name="parameterList"></param>
-        public Parameters(Dictionary<string, ParameterDetails> parameterList)
-        {
-            ParameterList = parameterList;
-        }
-
-        /// <summary>
-        /// List of parameters
-        /// </summary>
-        public Dictionary<string, ParameterDetails> ParameterList { get; private set; }
+        public Dictionary<string, ParameterDetails> Parameters { get; private set; }
     }
 
     /// <summary>

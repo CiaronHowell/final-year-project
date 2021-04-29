@@ -161,7 +161,7 @@ namespace FinalYearProject.Backend
         /// Runs the method
         /// </summary>
         /// <param name="methodName"></param>
-        public void Run(string methodName, Parameters parameters)
+        public void Run(string methodName, Dictionary<string, ParameterDetails> parameters)
         {
             if (!ModuleMethods.ContainsKey(methodName))
             {
@@ -180,24 +180,26 @@ namespace FinalYearProject.Backend
             }
 
             object[] inputParameters = null;
-            if (parameters.ParameterList != null)
+            if (parameters != null)
             {
-                int length = parameters.ParameterList.Count;
+                int length = parameters.Count;
                 // Initialise the array to contain the parameters
                 inputParameters = new object[length];
 
-                int count = 0;
-                // Go through 
-                foreach (var element in parameters.ParameterList)
+                int index = 0;
+                // Go through parameters for the method
+                foreach (var element in parameters)
                 {
-                    // convert to their respective types 
+                    // Get the type of the parameter
                     Type parameterType = Type.GetType(element.Value.Type);
-                    // Get the converter for the type
+                    // Get the converter for the parameter type
                     TypeConverter converter = TypeDescriptor.GetConverter(parameterType);
 
+                    // Parse the value given to the parameter
                     object parsedParameterValue = converter.ConvertFromString(element.Value.Value);
 
-                    inputParameters[count++] = parsedParameterValue;
+                    // Add the parsed value to the input parameters and iterate the index
+                    inputParameters[index++] = parsedParameterValue;
                     Debug.WriteLine(element.Value.Value);
                 }
             }

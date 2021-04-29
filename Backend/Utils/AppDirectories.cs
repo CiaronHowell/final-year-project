@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FinalYearProject.Backend.Utils
 {
@@ -23,6 +19,9 @@ namespace FinalYearProject.Backend.Utils
         /// </summary>
         public static string SUPPORTING_DLLS_DIRECTORY;
 
+        /// <summary>
+        /// Static constructor
+        /// </summary>
         static AppDirectories()
         {
             APP_DIRECTORY =
