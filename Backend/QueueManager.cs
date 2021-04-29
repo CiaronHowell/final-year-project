@@ -50,7 +50,7 @@ namespace FinalYearProject.Backend
         }
 
         /// <summary>
-        /// 
+        /// Event handler for dequeued task
         /// </summary>
         /// <param name="sender">TaskQueue</param>
         /// <param name="e">The dequeued item</param>
@@ -68,7 +68,7 @@ namespace FinalYearProject.Backend
         /// <param name="tasks">The tasks of the workflow</param>
         public void LoadQueue(List<WorkflowMethod> tasks)
         {
-            // Load up queue with the method names
+            // Load up queue with the method ids
             foreach (WorkflowMethod task in tasks)
             {
                 CurrentTasks.Enqueue(task.MethodId);
@@ -83,7 +83,7 @@ namespace FinalYearProject.Backend
         /// </summary>
         public void StartQueue()
         {
-            // Just unpause if we've already paused
+            // Just unpause if we're in paused state
             if (PauseToken.Pause)
             {
                 PauseToken.Pause = false;
@@ -126,13 +126,14 @@ namespace FinalYearProject.Backend
 
                 // Get the current task id
                 string currentTaskId = CurrentTasks.Dequeue();
-                Debug.WriteLine($"Output from thread: {currentTaskId}");
+                Debug.WriteLine($"Current task: {currentTaskId}");
 
                 // Find the task info using the task id
                 WorkflowMethod currentTask = TaskInfo.Find(workflowMethod => workflowMethod.MethodId == currentTaskId);
                 // Give the name of the method and the parameters
                 ModuleManager.Run(currentTask.MethodName, currentTask.Parameters);
 
+                // Delay for demo
                 DateTime waitTill = DateTime.Now.AddSeconds(5);
                 SpinWait.SpinUntil(() => DateTime.Now > waitTill);
             }
@@ -163,9 +164,10 @@ namespace FinalYearProject.Backend
         /// </summary>
         private void CleanUp()
         {
+            Debug.WriteLine("Clearing Current Tasks");
+
             // Clear queue ready for next workflow
             CurrentTasks.Clear();
-            Debug.WriteLine("Clearing Current Tasks");
 
             // Make sure we're unpaused
             PauseToken.Pause = false;

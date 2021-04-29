@@ -58,6 +58,7 @@ namespace FinalYearProject.Backend
 
         private void LoadSupportingLibraries()
         {
+            // Search directory for dlls
             string[] files = Directory.GetFiles(AppDirectories.SUPPORTING_DLLS_DIRECTORY, "*.dll");
             if (files.Length == 0)
             {
@@ -76,7 +77,7 @@ namespace FinalYearProject.Backend
         /// <summary>
         /// Load all DLL files located in app directory
         /// </summary>
-        public void LoadModules()
+        private void LoadModules()
         {
             _loadingModules = true;
 
@@ -120,16 +121,16 @@ namespace FinalYearProject.Backend
                     BindingFlags.Instance |
                     BindingFlags.InvokeMethod |
                     BindingFlags.DeclaredOnly);
-                foreach (MethodInfo info in infos)
+                foreach (MethodInfo methodInfo in infos)
                 {
-                    string name = $"{type.Name}.{info.Name}";
-                    Debug.WriteLine(name);
+                    string methodName = $"{type.Name}.{methodInfo.Name}";
+                    Debug.WriteLine(methodName);
 
                     ModuleMethods.Add(
-                        name,
+                        methodName,
                         new Method(
-                            info,
-                            GetParameterInfo(info),
+                            methodInfo,
+                            GetParameterInfo(methodInfo),
                             type)
                         );
                 }
@@ -164,29 +165,29 @@ namespace FinalYearProject.Backend
         {
             if (!ModuleMethods.ContainsKey(methodName))
             {
-                // TODO: Should I throw an error here or just log it
                 Debug.WriteLine("Method not found");
                 return;
             }
 
             Debug.WriteLine($"Running {methodName}");
-            Method method = ModuleMethods[methodName];
 
+            Method method = ModuleMethods[methodName];
             // We need to make sure that only one instance of the class is created for all methods
             if (!_createdInstances.Exists(activatedInstance => activatedInstance.GetType() == method.InstanceType))
             {
-                Debug.WriteLine("Instance hit");
+                // We create an instance of the class and store it
                 _createdInstances.Add(Activator.CreateInstance(method.InstanceType));
             }
 
-            object[] parametersArray = null;
+            object[] inputParameters = null;
             if (parameters.ParameterList != null)
             {
                 int length = parameters.ParameterList.Count;
-
-                parametersArray = new object[length];
+                // Initialise the array to contain the parameters
+                inputParameters = new object[length];
 
                 int count = 0;
+                // Go through 
                 foreach (var element in parameters.ParameterList)
                 {
                     // convert to their respective types 
@@ -196,19 +197,17 @@ namespace FinalYearProject.Backend
 
                     object parsedParameterValue = converter.ConvertFromString(element.Value.Value);
 
-                    parametersArray[count++] = parsedParameterValue;
+                    inputParameters[count++] = parsedParameterValue;
                     Debug.WriteLine(element.Value.Value);
                 }
-             }
-
-            //method.MethodInfo.Attributes
+            }
 
             try
             {
-                // We use the activated instance to run the method 
+                // We use the activated instance to run the method. We will also wait for invoked method to finish
                 method.MethodInfo.Invoke(
-                    _createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType), 
-                    parametersArray);
+                    _createdInstances.Find(activatedInstance => activatedInstance.GetType() == method.InstanceType),
+                    inputParameters);
             }
             catch (Exception ex)
             {

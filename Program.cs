@@ -29,50 +29,83 @@ namespace FinalYearProject
         /// </summary>
         private const string UNIQUE_SPLIT_STRING = "!,!";
 
+        #region Backend Commands
+        /// <summary>
+        /// Constant string for "open diagram" function
+        /// </summary>
+        private const string OPEN_DIAGRAM_FUNCTION = "openFunc";
+
+        /// <summary>
+        /// Constant string for "save diagram" function
+        /// </summary>
+        private const string SAVE_DIAGRAM_FUNCTION = "saveFunc";
+
+        /// <summary>
+        /// Constant string for "new diagram" function
+        /// </summary>
+        private const string NEW_DIAGRAM_FUNCTION = "newDiagramFunc";
+
+        /// <summary>
+        /// Constant string for "play workflow" function
+        /// </summary>
+        private const string PLAY_WORKFLOW_FUNCTION = "playWorkflowFunc";
+
+        /// <summary>
+        /// Constant string for "pause workflow" function
+        /// </summary>
+        private const string PAUSE_WORKFLOW_FUNCTION = "pauseWorkflowFunc";
+
+        /// <summary>
+        /// Constant string for "stop workflow" function
+        /// </summary>
+        private const string STOP_WORKFLOW_FUNCTION = "stopWorkflowFunc";
+
+        /// <summary>
+        /// Constant string for "load module info" function
+        /// </summary>
+        private const string LOAD_MODULE_INFO_FUNCTION = "loadModuleInfoFunc";
+
+        /// <summary>
+        /// Constant string for "test" message
+        /// </summary>
+        private const string TEST = "test";
+        #endregion
+
+        #region GUI Commands
+        /// <summary>
+        /// Constant string for GUI "load diagram" function
+        /// </summary>
+        private const string GUI_LOAD_DIAGRAM_FUNCTION = "loadDiagramFunc";
+
+        /// <summary>
+        /// Constant string for GUI "save diagram" reply
+        /// </summary>
+        private const string GUI_SAVE_DIAGRAM_REPLY = "saveDiagramReply";
+
+        /// <summary>
+        /// Constant string for GUI "load module info" reply
+        /// </summary>
+        private const string GUI_LOAD_MODULE_INFO_REPLY = "loadModuleInfoReply";
+        #endregion
+
         [STAThread]
         static void Main(string[] args)
         {
-            // Window title declared here for visibility
-            string windowTitle = "Final Year Project";
-
-            // Need to register these handlers before initialising the window
-            Action<PhotinoWindowOptions> windowConfiguration = options =>
-            {
-                // This event handler is fired before the windows constructor is called
-                options.WindowCreatingHandler += (object sender, EventArgs args) =>
+            // Create the container window and load the index page
+            PhotinoWindow window = new PhotinoWindow(
+                "Final Year Project", 
+                (options) => 
                 {
-                    var window = (PhotinoWindow)sender; // Instance is not initialized at this point. Class properties are not set yet.
-                    Console.WriteLine($"Creating new PhotinoWindow instance.");
-                };
-
-                // This event handler is fired after the windows constructor is called
-                options.WindowCreatedHandler += (object sender, EventArgs args) =>
-                {
-                    var window = (PhotinoWindow)sender; // Instance is initialized. Class properties are now set and can be used.
-                    Console.WriteLine($"Created new PhotinoWindow instance with title {window.Title}.");
-                };
-
-                // This event handler will handle messages sent from the GUI.
-                // I could register this after initialising the window but seems neater here
-                options.WebMessageReceivedHandler += MessageHandler;
-
-                //options.WindowClosingHandler - If I need to 
-            };
-
-            var window = new PhotinoWindow(windowTitle, windowConfiguration)
-                .Resize(50, 50, "%")
+                    // This event handler will handle messages sent from the GUI
+                    options.WebMessageReceivedHandler += MessageHandler; 
+                })
                 .Center()
-                .UserCanResize(true)
                 .Load("wwwroot/index.html");
 
-            // Need to instantiate queue manager and module manager
-            // before we wait for the window to close
+            // Need to instantiate all managers before we wait for the window to close
             ModuleManager = new();
             QueueManager = new(ModuleManager);
             DiagramManager = new();
-
-            // Load Modules
-            //ModuleManager.LoadModules();
 
             // Allow other classes to send messages to the GUI
             Window.CurrentWindow = window;
@@ -87,55 +120,63 @@ namespace FinalYearProject
         /// <param name="message"></param>
         private static void MessageHandler(object sender, string message) 
         {
+            // Get the current window
             var window = (PhotinoWindow)sender;
 
+            // Split the message into the command and args
             string[] command = message.Split(UNIQUE_SPLIT_STRING, 2);
             switch (command[0])
             {
-                case "openFunc":
+                case OPEN_DIAGRAM_FUNCTION:
                     try
                     {
                         // Retrieve diagram
-                        string diagram = DiagramManager.GetDiagramXML(out string name);
+                        string diagramXML = DiagramManager.GetDiagramXML(out string diagramName);
 
                         // Send diagram XML to the GUI
-                        window.SendWebMessage($"loadDiagramFunc{UNIQUE_SPLIT_STRING}{diagram}{UNIQUE_SPLIT_STRING}{name}");
-                        Debug.WriteLine(diagram);
+                        window.SendWebMessage($"{GUI_LOAD_DIAGRAM_FUNCTION}{UNIQUE_SPLIT_STRING}{diagramXML}{UNIQUE_SPLIT_STRING}{diagramName}");
+                        Debug.WriteLine(diagramXML);
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex);
+                        Debug.WriteLine($"Error when trying to open diagram: {ex}");
 
                         window.OpenAlertWindow("Loading Diagram", "Failed to load diagram.");
                     }
                     break;
                     
-                case "saveFunc":
+                case SAVE_DIAGRAM_FUNCTION:
                     try
                     {
-                        DiagramManager.SaveDiagram(command[1], out string name, out bool cancelled);
+                        string diagramXML = command[1];
+                        // Saving diagram xml where the user decides
+                        DiagramManager.SaveDiagram(diagramXML, out string name, out bool cancelled);
 
                         if (!cancelled)
                         {
                             window.OpenAlertWindow("Saving Diagram", "Saved diagram successfully.");
                         }
 
-                        window.SendWebMessage($"saveDiagramReply{UNIQUE_SPLIT_STRING}{(cancelled ? "cancelled" : "success")}, {name}");
+                        // Send back whether the xml was saved or cancelled and what the name is (if not cancelled)
+                        window.SendWebMessage($"{GUI_SAVE_DIAGRAM_REPLY}{UNIQUE_SPLIT_STRING}{(cancelled ? "cancelled" : "success")}{UNIQUE_SPLIT_STRING}{name}");
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex);
+                        Debug.WriteLine($"Error when trying to save diagram: {ex}");
 
                         window.OpenAlertWindow("Saving Diagram", "Failed to save diagram.");
                     }
                     break;
 
-                case "newDiagramFunc":
+                case NEW_DIAGRAM_FUNCTION:
                     // Just clear the "cached" diagram
                     DiagramManager.ClearDiagram();
+
+                    // Don't need to send an alert as the user should see that the diagram has been set
+                    // to a new diagram
                     break;
 
-                case "playWorkflowFunc":
+                case PLAY_WORKFLOW_FUNCTION:
                     if (!QueueManager.HasQueue)
                     {
                         QueueManager.LoadQueue(DiagramManager.ParseCurrentDiagramXML());
@@ -144,7 +185,7 @@ namespace FinalYearProject
                     QueueManager.StartQueue();
                     break;
 
-                case "pauseWorkflowFunc":
+                case PAUSE_WORKFLOW_FUNCTION:
                     try
                     {
                         QueueManager.PauseQueue();
@@ -157,10 +198,9 @@ namespace FinalYearProject
 
                         window.OpenAlertWindow("Pausing Workflow", "Failed to pause workflow.");
                     }
-
                     break;
 
-                case "stopWorkflowFunc":
+                case STOP_WORKFLOW_FUNCTION:
                     try
                     {
                         QueueManager.StopQueue();
@@ -171,19 +211,20 @@ namespace FinalYearProject
                     {
                         Debug.WriteLine(ex);
 
-                        window.OpenAlertWindow("PauStoppingsing Workflow", "Failed to stop workflow.");
+                        window.OpenAlertWindow("Stopping Workflow", "Failed to stop workflow.");
                     }
                     break;
 
-                case "loadModuleInfoFunc":
+                case LOAD_MODULE_INFO_FUNCTION:
+                    // Get module info such as methods and their parameters
                     string moduleInfo = ModuleManager.ModuleInfoAsJSONString();
                     
                     Debug.WriteLine(moduleInfo);
 
-                    window.SendWebMessage($"loadModuleInfoReply{UNIQUE_SPLIT_STRING}{moduleInfo}");
+                    window.SendWebMessage($"{GUI_LOAD_MODULE_INFO_REPLY}{UNIQUE_SPLIT_STRING}{moduleInfo}");
                     break;
 
-                case "test":
+                case TEST:
                     window.SendWebMessage(message);
                     break;
 

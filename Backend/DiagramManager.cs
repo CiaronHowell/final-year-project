@@ -24,41 +24,41 @@ namespace FinalYearProject.Backend
         public void SaveDiagram(string xml, out string name, out bool cancelled)
         {
             // Configure dialog
-            SaveFileDialog saveFileDialog = new()
+            SaveFileDialog saveDiagramDialog = new()
             {
-                InitialDirectory = AppDirectories.APP_DIRECTORY,
+                Title = "Save a Diagram",
                 Filter = "Diagram|*.bpmn",
-                FilterIndex = 1,
-                Title = "Save a Diagram"
+                InitialDirectory = AppDirectories.APP_DIRECTORY
             };
 
             // Setting name just in case the user cancels the dialog
             name = "";
 
-            DialogResult result = saveFileDialog.ShowDialog();
+            DialogResult result = saveDiagramDialog.ShowDialog();
             // Open the file dialog to let user select where they want to save diagram
             if (result == DialogResult.OK)
             {
-                Debug.WriteLine($"SaveDiagramTest: {saveFileDialog.FileName}");
+                Debug.WriteLine($"SaveDiagramTest: {saveDiagramDialog.FileName}");
 
-                Stream stream;
-                if ((stream = saveFileDialog.OpenFile()) != null)
+                Stream diagramStream = saveDiagramDialog.OpenFile();
+                if (diagramStream != null)
                 {
                     // Write XML string to file
-                    using (StreamWriter writer = new(stream))
+                    using (StreamWriter writer = new(diagramStream))
                     {
                         writer.Write(xml);
                     }
 
-                    stream.Close();
+                    diagramStream.Close();
                 }
 
-                name = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+                name = Path.GetFileNameWithoutExtension(saveDiagramDialog.FileName);
 
                 // Update current diagram
                 CurrentDiagram = xml;
             }
 
+            // Set whether user cancelled the dialog box
             cancelled = result == DialogResult.Cancel;
         }
 
@@ -69,21 +69,20 @@ namespace FinalYearProject.Backend
         public string GetDiagramXML(out string name)
         {
             // Configure dialog
-            OpenFileDialog openFileDialog = new()
+            OpenFileDialog openDiagramDialog = new()
             {
-                InitialDirectory = AppDirectories.APP_DIRECTORY,
+                Title = "Open a Diagram",
                 Filter = "Diagram|*.bpmn",
-                FilterIndex = 1,
-                Title = "Open a Diagram"
+                InitialDirectory = AppDirectories.APP_DIRECTORY                
             };
 
             name = "";
             string diagram = string.Empty;
             // Open the file dialog to let user select the diagram they want to load
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openDiagramDialog.ShowDialog() == DialogResult.OK)
             {
-                Stream stream;
-                if ((stream = openFileDialog.OpenFile()) != null)
+                Stream stream = openDiagramDialog.OpenFile();
+                if (stream != null)
                 {
                     using (StreamReader reader = new(stream))
                     {
@@ -96,9 +95,7 @@ namespace FinalYearProject.Backend
                 if (string.IsNullOrWhiteSpace(diagram))
                     throw new Exception("Diagram is blank");
 
-                name = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
-
-                Debug.WriteLine($"GetDiagramTest: Diagram - {diagram}");
+                name = Path.GetFileNameWithoutExtension(openDiagramDialog.FileName);
             }
 
             // Update current diagram
@@ -118,7 +115,7 @@ namespace FinalYearProject.Backend
         /// <summary>
         /// Parses the current diagram from XML to List
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns the workflow</returns>
         public List<WorkflowMethod> ParseCurrentDiagramXML()
         {
             XmlDocument diagram = new();
@@ -130,33 +127,39 @@ namespace FinalYearProject.Backend
             nsManager.AddNamespace("bpmn", "http://www.omg.org/spec/BPMN/20100524/MODEL");
             nsManager.AddNamespace("method", "http://Method");
 
+            // Gets the total number of elements in the diagram
             int numberOfElements = diagram.DocumentElement.SelectSingleNode("//bpmn:process", nsManager).ChildNodes.Count;
+            // Gets the total number of arrows in the diagram
             int numberOfArrowElements = diagram.DocumentElement.SelectNodes("//bpmn:sequenceFlow", nsManager).Count;
 
-            // We take away 1 due to us starting with the start event
+            // Removing the arrow elements gives us all of the feasible elements
             int feasibleElements = numberOfElements - numberOfArrowElements;
 
             // Get start event by searching through the XML document for the element.
             XmlNode startElement = diagram.DocumentElement.SelectSingleNode("//bpmn:startEvent", nsManager);
-            string outgoing = startElement.SelectSingleNode("bpmn:outgoing", nsManager).InnerText;
+            // Get the id of the next element that the start element is connected to
+            string nextElementId = startElement.SelectSingleNode("bpmn:outgoing", nsManager).InnerText;
 
             List<WorkflowMethod> workflow = new();
+            // Loop through feasible elements
             for (int i=0; i < feasibleElements; i++)
             {
-                XmlNode currentElement = GetNextElement(diagram, nsManager, outgoing);
+                XmlNode currentElement = GetNextElement(diagram, nsManager, nextElementId);
                 // If the inner text is null, assume that we are at the end of the workflow and leave it blank
                 //so it breaks at the next if statement
-                outgoing = currentElement.SelectSingleNode("bpmn:outgoing", nsManager)?.InnerText;
+                nextElementId = currentElement.SelectSingleNode("bpmn:outgoing", nsManager)?.InnerText;
 
-                if (string.IsNullOrWhiteSpace(outgoing)) break;
+                if (string.IsNullOrWhiteSpace(nextElementId)) break;
 
                 Debug.WriteLine(currentElement.Name);
                 // We only use serviceTasks to run methods
                 if (currentElement.Name != "bpmn:serviceTask") continue;
                 
+                // The extension element contains the parameter info; name, type and value
                 XmlNode extensionElement = currentElement.SelectSingleNode("./bpmn:extensionElements", nsManager);
 
                 Dictionary<string, ParameterDetails> parameterList = new();
+                // If the extension element isn't null then we can get all of the parameter info
                 if (extensionElement != null)
                 {
                     foreach (XmlNode parameterElement in extensionElement.ChildNodes)
@@ -171,28 +174,31 @@ namespace FinalYearProject.Backend
                     }
                 }
 
-                // store name
                 string methodId = currentElement.Attributes["id"].Value;
                 string methodName = currentElement.Attributes["name"].Value;
+
+                workflow.Add(
+                    new WorkflowMethod(
+                        methodId,
+                        methodName, 
+                        new Parameters(parameterList))
+                    );
+
                 Debug.WriteLine($"{methodId} {methodName}");
-                workflow.Add(new WorkflowMethod(
-                    methodId, 
-                    methodName, 
-                    new Parameters(parameterList)));
             }
 
             return workflow;
         }
 
         /// <summary>
-        /// 
+        /// Gets the next element 
         /// </summary>
         /// <param name="diagram"></param>
         /// <param name="nsManager"></param>
         /// <param name="outgoingId"></param>
         /// <param name="nextOutgoingId"></param>
-        /// <returns></returns>
-        private XmlNode GetNextElement(
+        /// <returns>Returns the element connected to the given element</returns>
+        private static XmlNode GetNextElement(
             XmlDocument diagram, 
             XmlNamespaceManager nsManager, 
             string outgoingId)
@@ -202,10 +208,8 @@ namespace FinalYearProject.Backend
 
             // Gets the element that the arrow is pointing at
             outgoingId = arrowElement.Attributes["targetRef"].Value;
-
+            
             return diagram.DocumentElement.SelectSingleNode($"//*[@id='{outgoingId}']", nsManager);
         }
     }
-
-    
 }
