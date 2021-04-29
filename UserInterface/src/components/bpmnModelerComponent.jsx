@@ -1,24 +1,22 @@
 import React from 'react';
 import BpmnModeler from 'bpmn-js/lib/Modeler';
 
-// Imports the moddle json file 
 import parameterModdleExtension from '../moddle/parameters';
+import TaskInfoPanel from '../scripts/taskInfoPanel';
+import { Context } from '../components/contextComponent';
 
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import '../css/diagram.css';
 
-import PropertiesPanel from '../scripts/propertiesPanel';
-
-import { Context } from '../components/contextComponent';
-import { is } from 'bpmn-js/lib/util/ModelUtil';
-
 class BpmnModelerComponent extends React.Component {
+    // App variables
     static contextType = Context;
 
     constructor() {
         super();
 
+        // Gets the current ref which is this component
         this.containerRef = React.createRef();
         this.dirtyFlag = false;
     }
@@ -27,15 +25,11 @@ class BpmnModelerComponent extends React.Component {
         // Send initialise flag to backend to get classes and methods
         this.initialiseBPMN()
 
-        // Add the event handlers only once
-        // this.addNavButtonEventHandlers();
+        // Add the event handlers for messages from the backend
         this.addWindowMessageEventHandlers();
     } 
 
     componentDidUpdate(){
-        // If the component updated then we need to check if it was due to the context values being changed
-        console.log(this.context.state.diagramName)
-        console.log(this.context.state.running)
         // If we are about to start a run and the user has made some edits,
         // we want the user to make sure they've saved 
         if (this.context.state.running && this.dirtyFlag) {
@@ -56,13 +50,14 @@ class BpmnModelerComponent extends React.Component {
             }
         });
 
+        // Event listener for when elements are altered
         this.modeler.on('element.changed', (e) => {
-            console.log("Hit in element.changed");
-            console.log(e)
+            // If we are running then assume that it is just a colour change
             if (!this.context.state.running)
                 this.dirtyFlag = true;
         });
 
+        // Show a new diagram
         await this.modeler.createDiagram();
 
         // access modeler components
@@ -75,10 +70,6 @@ class BpmnModelerComponent extends React.Component {
         window.external.sendMessage('loadModuleInfoFunc');
     }
 
-    componentWillUnmount() {
-        this.modeler.destroy();
-    }
-
     addWindowMessageEventHandlers() {
         // Wait for module info
         window.external.receiveMessage((message) => {
@@ -86,10 +77,10 @@ class BpmnModelerComponent extends React.Component {
 
             if (command[0] !== "loadModuleInfoReply") return;
 
-            console.log(this.modeler);
+            // Get module info such as method name and parameter name and type
             const moduleInfo = JSON.parse(command[1]);
             // Never used as it's just to create properties panel
-            const panel = new PropertiesPanel({
+            const panel = new TaskInfoPanel({
                 container: document.querySelector('#properties-panel'),
                 modeler: this.modeler,
                 moduleInfo
@@ -104,8 +95,6 @@ class BpmnModelerComponent extends React.Component {
             // If the message isn't the command that we want then we just 
             //  return nothing
             if (command[0] !== "loadDiagramFunc") return;
-
-            console.log(command[1]);
 
             // Display diagram
             await this.modeler.importXML(command[1])

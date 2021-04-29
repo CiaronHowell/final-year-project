@@ -6,20 +6,16 @@ import { is, getBusinessObject } from 'bpmn-js/lib/util/ModelUtil'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-function ElementPropertiesComponent(props) {
+function TaskPropertiesComponent(props) {
     console.log('Element updated')
 
-    let {
+    const {
         element,
         modeler,
         moduleInfo
     } = props;
 
     const moduleNames = Object.keys(moduleInfo);
-
-    if (element.labelTarget) {
-        element = element.labelTarget;
-    }
 
     useEffect(() => {
         // Update the data
@@ -29,11 +25,11 @@ function ElementPropertiesComponent(props) {
         }
     })
   
-    function updateName(name) {
+    function updateElementName(newElementName) {
         const modeling = modeler.get('modeling');
   
         console.log('changing name');
-        modeling.updateLabel(element, name);
+        modeling.updateLabel(element, newElementName);
     }
 
     // Update parameters button will only be available if the 
@@ -72,10 +68,12 @@ function ElementPropertiesComponent(props) {
         for (const inputElement of inputElements) {
             const parameterName = inputElement.name;
 
+            // Creates a blank element
             const method = moddle.create('method:parameter');
             method.name = parameterName;
             method.value = inputElement.value;
             method.type = Parameters[parameterName];
+            // Append to the existing extensions element
             extensionElements.get('values').push(method);
         }
 
@@ -101,9 +99,11 @@ function ElementPropertiesComponent(props) {
         }
     }
   
-    async function makeServiceTask() {
+    async function changeElementToServiceTask() {
+        // Gets replace module to alter element
         const bpmnReplace = modeler.get('bpmnReplace');
   
+        // Changes element to a service task
         bpmnReplace.replaceElement(element, {
             type: 'bpmn:ServiceTask'
         });
@@ -201,7 +201,7 @@ function ElementPropertiesComponent(props) {
         return (
             <div className="element-properties">
                 <fieldset>
-                    <label>Id: </label>
+                    <label>Element Id: </label>
                     <label>{ element.id }</label>
                 </fieldset>
 
@@ -209,8 +209,8 @@ function ElementPropertiesComponent(props) {
                     <Autocomplete 
                         options={moduleNames}
                         onChange={(event, methodName) => {
-                            updateName(methodName);
-                            if (!is(element, 'bpmn:ServiceTask')) makeServiceTask();
+                            updateElementName(methodName);
+                            if (!is(element, 'bpmn:ServiceTask')) changeElementToServiceTask();
                         }}
                         renderInput={(params) => <TextField {...params} label="Task"/>}
                     />
@@ -241,7 +241,7 @@ function ElementPropertiesComponent(props) {
                 <Autocomplete 
                     options={moduleNames}
                     onChange={(event, methodName) => {
-                        updateName(methodName);
+                        updateElementName(methodName);
                         methodSelected(methodName)
                     }}
                     value={element.businessObject.name}
@@ -264,4 +264,4 @@ function ElementPropertiesComponent(props) {
     );
 }
 
-export default ElementPropertiesComponent;
+export default TaskPropertiesComponent;

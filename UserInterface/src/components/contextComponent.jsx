@@ -2,7 +2,8 @@ import React from 'react';
 
 export const Context = React.createContext();
 
-export default class ContextProvider extends React.Component {
+class ContextProvider extends React.Component {
+    //
     state = {
         diagramName: "",
         running: false,
@@ -35,3 +36,5 @@ export default class ContextProvider extends React.Component {
         )
     }
 }
+
+export default ContextProvider;

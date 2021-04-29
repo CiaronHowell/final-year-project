@@ -1,8 +1,8 @@
 import React from 'react';
 
-import ElementPropertiesComponent from './elementPropertiesComponent';
+import TaskPropertiesComponent from './taskPropertiesComponent';
 
-class PropertiesViewComponent extends React.Component {
+class TaskPropertiesViewComponent extends React.Component {
     constructor(props) {
         super(props);
 
@@ -15,48 +15,51 @@ class PropertiesViewComponent extends React.Component {
     }
 
     componentDidMount() {
+        // Get the diagram modeler from the properties
         const {
             modeler
         } = this.props;
 
-        modeler.on('selection.changed', (e) => {
+        // Selection event handler
+        modeler.on('selection.changed', (event) => {
             // Get the current element from the state
             const {
                 element: currentElement
             } = this.state;
 
             // Return if there is no new selection
-            if (e.newSelection.length === 0) return;
-
-            console.log(currentElement);
+            if (event.newSelection.length === 0) return;
 
             // Return if the current element isn't null and 
             //the current element is the same as the new selection
             if (currentElement 
-                && currentElement.id === e.newSelection[0].id) return;
+                && currentElement.id === event.newSelection[0].id) return;
 
+            // Set the state to the new element
             this.setState({
-                selectedElements: e.newSelection,
-                element: e.newSelection[0]
+                selectedElements: event.newSelection,
+                element: event.newSelection[0]
             });
         });
 
-        modeler.on('element.changed', (e) => {
+        // Element changed handler
+        modeler.on('element.changed', (event) => {
             const {
                 element: currentElement
             } = this.state;
 
+            // Don't do anything if the current element is null
             if (!currentElement) return;
 
-            console.log(e.element);
+            console.log(event.element);
 
             // Set the element if the element has changed type
-            if (e.element.id === currentElement.id 
-                && currentElement.type !== e.element.type) {
+            if (event.element.id === currentElement.id 
+                && currentElement.type !== event.element.type) {
                 console.log('hit inside element changed if');
 
                 this.setState({
-                    element: e.element
+                    element: event.element
                 });
             }
         });
@@ -68,15 +71,19 @@ class PropertiesViewComponent extends React.Component {
             moduleInfo
         } = this.props;
     
+        // Get the selectedElements and elements out of the current state
         const {
             selectedElements,
             element
         } = this.state;
 
+        // If the selected element is one or more then set the task panel to visible
         if (selectedElements.length >= 1) {
+            // Set the container to visible
             this.props.container.style.visibility = "visible";
 
-            return <ElementPropertiesComponent modeler={ modeler } element={ element } moduleInfo={ moduleInfo } />;
+            // Render the task properties component
+            return <TaskPropertiesComponent modeler={ modeler } element={ element } moduleInfo={ moduleInfo } />;
         }
 
         this.props.container.style.visibility = "hidden";
@@ -84,4 +91,4 @@ class PropertiesViewComponent extends React.Component {
     }
 }
 
-export default PropertiesViewComponent;
+export default TaskPropertiesViewComponent;
