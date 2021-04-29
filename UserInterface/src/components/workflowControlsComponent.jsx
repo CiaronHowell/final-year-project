@@ -7,26 +7,6 @@ class WorkflowControlsComponent extends React.Component {
     // so we can share data with other components
     static contextType = Context;
 
-    constructor() {
-        super();
-
-        // Make sure that sendMessage and receiveMessage exist
-        // when the frontend is started without the Photino context.
-        // I.e. using React's `npm run start` command and hot reload.
-        if (typeof(window.external.sendMessage) !== 'function') {
-            window.external.sendMessage = (message) => console.log("Emulating sendMessage.\nMessage sent: " + message);
-        }
-
-        if (typeof(window.external.receiveMessage) !== 'function') {
-            window.external.receiveMessage = (delegate) => {
-                let message = 'Simulating message from backend.';
-                delegate(message);
-            };
-
-            window.external.receiveMessage((message) => console.log("Emulating receiveMessage.\nMessage received: " + message));
-        }
-    }
-
     componentDidMount() {
         this.addWindowMessageEventHandlers();
     }
@@ -38,12 +18,11 @@ class WorkflowControlsComponent extends React.Component {
 
             if (command[0] !== "playReply") return;
 
-            // Do stuff for play
             if (command[1] === "success") {
-                this.context.setRunning(false);
-
-            } else {
-                // Disable play button and enable pause button
+                this.context.setRunning(true);
+                this.context.setPaused(false);
+                // Make stop button available
+                this.context.setDisableStop(false);
             }
         });
 
@@ -53,7 +32,11 @@ class WorkflowControlsComponent extends React.Component {
 
             if (command[0] !== "pauseReply") return;
 
-            // Do stuff for play
+            if (command[1] === "success") {
+                this.context.setRunning(false);
+                this.context.setPaused(true);
+
+            }
         });
 
         // Event listener for stop messages
@@ -62,15 +45,15 @@ class WorkflowControlsComponent extends React.Component {
 
             if (command[0] !== "stopReply") return;
 
-            // Do stuff for play if successful
-
-            // Disable editing until completion or 
+            if (command[1] === "success") {
+                this.context.setRunning(false);
+                this.context.setPaused(false);
+                this.context.setDisableStop(true);
+            }
         });
     }
 
     playWorkflow() {
-        this.context.setRunning(true);
-
         window.external.sendMessage('playWorkflowFunc');
     }
 
@@ -87,13 +70,25 @@ class WorkflowControlsComponent extends React.Component {
 
         return (
             <div id="workflowControls">
-                <button id="playButton" onClick={() => { this.playWorkflow() }}>
+                <button 
+                    id="playButton" 
+                    onClick={() => { this.playWorkflow() }} 
+                    disabled={this.context.state.running}
+                >
                     Play
                 </button>
-                <button id="pauseButton" onClick={() => { this.pauseWorkflow() }}>
+                <button 
+                    id="pauseButton" 
+                    onClick={() => { this.pauseWorkflow() }} 
+                    disabled={!this.context.state.running || this.context.state.paused}
+                >
                     Pause
                 </button>
-                <button id="stopButton" onClick={() => { this.stopWorkflow() }}>
+                <button 
+                    id="stopButton" 
+                    onClick={() => { this.stopWorkflow() }} 
+                    disabled={this.context.state.disableStop}
+                >
                     Stop
                 </button>
             </div>

@@ -196,13 +196,22 @@ class BpmnModelerComponent extends React.Component {
             <div id="canvas" className="react-bpmn-diagram-container" ref={ this.containerRef }>
                 <label id="diagramName">{ this.context.state.diagramName }</label>
                 <div id="diagramControls">
-                    <button onClick={ () =>  { this.saveDiagram() } }>
+                    <button 
+                        onClick={ () =>  { this.saveDiagram() } }
+                        disabled={ this.context.state.running || this.context.state.paused}
+                    >
                         Save
                     </button>
-                    <button onClick={ () =>  { this.loadDiagram() } }>
+                    <button 
+                        onClick={ () =>  { this.loadDiagram() } }
+                        disabled={ this.context.state.running || this.context.state.paused}
+                    >
                         Load
                     </button>
-                    <button onClick={ () =>  { this.newDiagram() } }>
+                    <button 
+                        onClick={ () =>  { this.newDiagram() } }
+                        disabled={ this.context.state.running || this.context.state.paused}
+                    >
                         New
                     </button>
                 </div>

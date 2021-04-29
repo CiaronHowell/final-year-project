@@ -5,7 +5,9 @@ export const Context = React.createContext();
 export default class ContextProvider extends React.Component {
     state = {
         diagramName: "",
-        running: false
+        running: false,
+        paused: false,
+        disableStop: true
     }
 
     render() {
@@ -18,6 +20,13 @@ export default class ContextProvider extends React.Component {
                     }),
                     setRunning: (value) => this.setState({
                         running: value
+                    }),
+                    setPaused: (value) => this.setState({
+                        paused: value
+                    })
+                    ,
+                    setDisableStop: (value) => this.setState({
+                        disableStop: value
                     })
                 }
             }>

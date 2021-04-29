@@ -141,6 +141,8 @@ namespace FinalYearProject.Backend
             Window.CurrentWindow.OpenAlertWindow("Executing Workflow", "Workflow has finished");
             // Send back nothing to tell the GUI to clear the coloured element
             Window.SendMessage("currentTask", "");
+            // Make sure GUI buttons are in the correct way
+            Window.SendMessage("stopReply", "success");
         }
 
         /// <summary>

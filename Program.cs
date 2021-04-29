@@ -177,12 +177,24 @@ namespace FinalYearProject
                     break;
 
                 case PLAY_WORKFLOW_FUNCTION:
-                    if (!QueueManager.HasQueue)
+                    try
                     {
-                        QueueManager.LoadQueue(DiagramManager.ParseCurrentDiagramXML());
+                        if (!QueueManager.HasQueue)
+                        {
+                            QueueManager.LoadQueue(DiagramManager.ParseCurrentDiagramXML());
+                        }
+
+                        QueueManager.StartQueue();
+
+                        window.SendWebMessage($"playReply{UNIQUE_SPLIT_STRING}success");
                     }
-                    
-                    QueueManager.StartQueue();
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+
+                        window.OpenAlertWindow("Pausing Workflow", "Failed to pause workflow.");
+                        window.SendWebMessage($"playReply{UNIQUE_SPLIT_STRING}failed");
+                    }
                     break;
 
                 case PAUSE_WORKFLOW_FUNCTION:
@@ -190,12 +202,14 @@ namespace FinalYearProject
                     {
                         QueueManager.PauseQueue();
 
+                        window.SendWebMessage($"pauseReply{UNIQUE_SPLIT_STRING}success");
                         window.OpenAlertWindow("Pausing Workflow", "Paused workflow successfully.");
                     }
                     catch (Exception ex)
                     {
                         Debug.WriteLine(ex);
 
+                        window.SendWebMessage($"pauseReply{UNIQUE_SPLIT_STRING}failed");
                         window.OpenAlertWindow("Pausing Workflow", "Failed to pause workflow.");
                     }
                     break;
@@ -205,12 +219,14 @@ namespace FinalYearProject
                     {
                         QueueManager.StopQueue();
 
+                        window.SendWebMessage($"stopReply{UNIQUE_SPLIT_STRING}success");
                         window.OpenAlertWindow("Stopping Workflow", "Stopped workflow successfully.");
                     }
                     catch (Exception ex)
                     {
                         Debug.WriteLine(ex);
 
+                        window.SendWebMessage($"stopReply{UNIQUE_SPLIT_STRING}failed");
                         window.OpenAlertWindow("Stopping Workflow", "Failed to stop workflow.");
                     }
                     break;
