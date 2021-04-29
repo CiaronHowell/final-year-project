@@ -45,6 +45,7 @@ class BpmnModelerComponent extends React.Component {
             moddleExtensions: {
                 method: parameterModdleExtension
             },
+            // Allows use to use keyboard binds
             keyboard: {
                 bindTo: document.body
             }
@@ -80,8 +81,8 @@ class BpmnModelerComponent extends React.Component {
             // Get module info such as method name and parameter name and type
             const moduleInfo = JSON.parse(command[1]);
             // Never used as it's just to create properties panel
-            const panel = new TaskInfoPanel({
-                container: document.querySelector('#properties-panel'),
+            const taskInfoPanel = new TaskInfoPanel({
+                container: document.querySelector('#task-info-panel'),
                 modeler: this.modeler,
                 moduleInfo
             });
@@ -204,7 +205,7 @@ class BpmnModelerComponent extends React.Component {
                         New
                     </button>
                 </div>
-                <div id="properties-panel" className="center"/>
+                <div id="task-info-panel" className="center"/>
             </div>
         );
     }

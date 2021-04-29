@@ -9,7 +9,7 @@ fieldset {
     height: 100%;
 }
 
-#properties-panel {
+#task-info-panel {
     z-index: 2;
     right: -105px;
     left: unset;
