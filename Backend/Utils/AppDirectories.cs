@@ -12,12 +12,12 @@ namespace FinalYearProject.Backend.Utils
         /// <summary>
         /// DLL Directory
         /// </summary>
-        public static string DLL_DIRECTORY;
+        public static readonly string DLL_DIRECTORY;
 
         /// <summary>
         /// Supporting DLLs Directory
         /// </summary>
-        public static string SUPPORTING_DLLS_DIRECTORY;
+        public static readonly string SUPPORTING_DLLS_DIRECTORY;
 
         /// <summary>
         /// Static constructor

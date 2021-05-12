@@ -6,13 +6,15 @@ import TaskPropertiesViewComponent from '../components/taskPropertiesViewCompone
 class TaskInfoPanel {
 
     constructor(parameters) {
+        // Split the parameters into the variables that have been passed down
         const {
             modeler,
             container,
             moduleInfo
         } = parameters;
 
-        // Render the task properties view 
+        // Render the task properties view and pass the modeler, 
+        //container and module info via the properties of the component
         ReactDOM.render(
             <TaskPropertiesViewComponent 
                 modeler={ modeler } 
